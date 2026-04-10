@@ -232,11 +232,15 @@
         bgImageError.textContent = "Could not read this image.";
         return;
       }
-      localStorage.setItem(STORAGE_KEYS.BG_IMAGE, dataUrl);
       bgImageInput.value = "";
       bgImageInput.removeAttribute("aria-invalid");
       bgImageError.textContent = "";
       setBodyBgImage(dataUrl);
+      try {
+        localStorage.setItem(STORAGE_KEYS.BG_IMAGE, dataUrl);
+      } catch (_) {
+        bgImageError.textContent = "Image applied, but it is too large to save. Try a smaller image.";
+      }
     };
     reader.onerror = function () {
       bgImageError.textContent = "Could not read this image.";
@@ -266,6 +270,12 @@
   });
 
   applyBgBtn.addEventListener("click", function () {
+    const file = bgFileInput.files && bgFileInput.files[0];
+    if (file) {
+      applyLocalBackgroundFile(file);
+      return;
+    }
+
     const raw = bgImageInput.value.trim();
     if (raw) {
       const safeUrl = sanitizeHttpUrl(raw);
@@ -280,11 +290,6 @@
       localStorage.setItem(STORAGE_KEYS.BG_IMAGE, safeUrl);
       setBodyBgImage(safeUrl);
       return;
-    }
-
-    const file = bgFileInput.files && bgFileInput.files[0];
-    if (file) {
-      applyLocalBackgroundFile(file);
     }
   });
 
