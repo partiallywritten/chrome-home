@@ -98,10 +98,12 @@
     const s = String(now.getSeconds()).padStart(2, "0");
     timeEl.textContent = `${h}:${m}:${s}`;
     dateEl.textContent = `${DAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}`;
+
+    const delay = 1000 - (Date.now() % 1000);
+    setTimeout(updateClock, delay);
   }
 
   updateClock();
-  setInterval(updateClock, 1000);
 
   /* ── Background (chrome.storage.local) ────────────────────── */
 
