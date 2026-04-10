@@ -602,6 +602,34 @@ input[type="range"] {
   border-color: var(--danger);
 }
 
+.btn-restore {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  width: 100%;
+}
+
+.btn-restore:hover {
+  background: rgba(194, 101, 120, 0.12);
+}
+
+.btn-restore.confirm-pending {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.btn-restore.confirm-pending:hover {
+  background: #a54d5e;
+}
+
+/* ── Settings footer ──────────────────────────────────────────── */
+.settings-footer {
+  padding: 1rem 1.35rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .settings-panel {

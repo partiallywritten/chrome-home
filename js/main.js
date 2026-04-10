@@ -16,6 +16,8 @@
     CLOCK_X: "0",
     CLOCK_Y: "0",
     FONT_FAMILY: "\"JetBrains Mono\", \"Fira Code\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
+    TAB_NAME: "",
+    FAVICON: "",
   };
   const DEFAULT_TEXT_RGB = {
     r: parseInt(DEFAULTS.TEXT_COLOR.slice(1, 3), 16),
@@ -35,6 +37,8 @@
     CLOCK_Y: "ch_clock_y",
     FONT_URL: "ch_font_url",
     FONT_FAMILY: "ch_font_family",
+    TAB_NAME: "ch_tab_name",
+    FAVICON: "ch_favicon",
   };
 
   /* ── DOM references ────────────────────────────────────────── */
@@ -70,6 +74,15 @@
   const favUrlError = document.getElementById("fav-url-error");
   const modalCancel = document.getElementById("modal-cancel");
   const modalSave = document.getElementById("modal-save");
+  const tabNameInput = document.getElementById("tab-name");
+  const applyTabNameBtn = document.getElementById("apply-tab-name");
+  const faviconUrlInput = document.getElementById("favicon-url");
+  const faviconUrlError = document.getElementById("favicon-url-error");
+  const faviconFileInput = document.getElementById("favicon-file");
+  const applyFaviconBtn = document.getElementById("apply-favicon");
+  const clearFaviconBtn = document.getElementById("clear-favicon");
+  const restoreDefaultsBtn = document.getElementById("restore-defaults");
+  const settingsSections = settingsPanel.querySelectorAll("details.settings-section");
 
   /* ── Clock ─────────────────────────────────────────────────── */
   const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -241,6 +254,136 @@
     applyCustomFont(fontUrl, fontFamily);
   }
 
+  /* ── General (tab name & favicon) ─────────────────────────── */
+
+  function setFavicon(href) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (href) {
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.href = href;
+    } else if (link) {
+      link.remove();
+    }
+  }
+
+  function applyGeneralSettings() {
+    const tabName = localStorage.getItem(STORAGE_KEYS.TAB_NAME) || DEFAULTS.TAB_NAME;
+    const favicon = localStorage.getItem(STORAGE_KEYS.FAVICON) || DEFAULTS.FAVICON;
+    tabNameInput.value = tabName;
+    document.title = tabName || "New Tab";
+    if (favicon) {
+      const isDataImage = favicon.startsWith("data:image/");
+      const safeUrl = isDataImage ? favicon : sanitizeHttpUrl(favicon);
+      if (safeUrl) {
+        setFavicon(safeUrl);
+        faviconUrlInput.value = isDataImage ? "" : safeUrl;
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.FAVICON);
+        setFavicon("");
+        faviconUrlInput.value = "";
+      }
+    } else {
+      setFavicon("");
+      faviconUrlInput.value = "";
+    }
+  }
+
+  function applyLocalFaviconFile(file) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      faviconUrlError.textContent = "Please upload an image file.";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const dataUrl = String(event.target.result);
+      if (!dataUrl.startsWith("data:image/")) {
+        faviconUrlError.textContent = "Could not read this image.";
+        return;
+      }
+      faviconUrlInput.value = "";
+      faviconUrlInput.removeAttribute("aria-invalid");
+      faviconUrlError.textContent = "";
+      localStorage.setItem(STORAGE_KEYS.FAVICON, dataUrl);
+      setFavicon(dataUrl);
+    };
+    reader.onerror = function () {
+      faviconUrlError.textContent = "Could not read this image.";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  applyTabNameBtn.addEventListener("click", function () {
+    const name = tabNameInput.value.trim();
+    if (name) {
+      localStorage.setItem(STORAGE_KEYS.TAB_NAME, name);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.TAB_NAME);
+    }
+    document.title = name || "New Tab";
+  });
+
+  applyFaviconBtn.addEventListener("click", function () {
+    const file = faviconFileInput.files && faviconFileInput.files[0];
+    if (file) {
+      applyLocalFaviconFile(file);
+      return;
+    }
+    const raw = faviconUrlInput.value.trim();
+    if (raw) {
+      const safeUrl = sanitizeHttpUrl(raw);
+      if (!safeUrl) {
+        faviconUrlInput.setAttribute("aria-invalid", "true");
+        faviconUrlError.textContent = "Please enter a valid http or https image URL.";
+        faviconUrlInput.focus();
+        return;
+      }
+      faviconUrlInput.removeAttribute("aria-invalid");
+      faviconUrlError.textContent = "";
+      localStorage.setItem(STORAGE_KEYS.FAVICON, safeUrl);
+      setFavicon(safeUrl);
+    }
+  });
+
+  faviconFileInput.addEventListener("change", function () {
+    const file = faviconFileInput.files && faviconFileInput.files[0];
+    if (!file) return;
+    applyLocalFaviconFile(file);
+  });
+
+  clearFaviconBtn.addEventListener("click", function () {
+    localStorage.removeItem(STORAGE_KEYS.FAVICON);
+    faviconUrlInput.value = "";
+    faviconFileInput.value = "";
+    faviconUrlInput.removeAttribute("aria-invalid");
+    faviconUrlError.textContent = "";
+    setFavicon("");
+  });
+
+  faviconUrlInput.addEventListener("input", function () {
+    if (faviconUrlInput.getAttribute("aria-invalid")) {
+      faviconUrlInput.removeAttribute("aria-invalid");
+      faviconUrlError.textContent = "";
+    }
+  });
+
+  /* ── Settings accordion ────────────────────────────────────── */
+  settingsSections.forEach(function (section) {
+    section.addEventListener("toggle", function () {
+      if (section.open) {
+        settingsSections.forEach(function (other) {
+          if (other !== section && other.open) {
+            other.removeAttribute("open");
+          }
+        });
+      }
+    });
+  });
+
   function applyBackground() {
     getBgImage(function (image) {
       if (!image) {
@@ -405,6 +548,47 @@
     if (fontUrlInput.getAttribute("aria-invalid")) {
       fontUrlInput.removeAttribute("aria-invalid");
       fontUrlError.textContent = "";
+    }
+  });
+
+  /* ── Restore defaults ──────────────────────────────────────── */
+  let restoreConfirmPending = false;
+  let restoreConfirmTimer = null;
+
+  function resetConfirmState() {
+    restoreConfirmPending = false;
+    clearTimeout(restoreConfirmTimer);
+    restoreDefaultsBtn.textContent = "Restore Defaults";
+    restoreDefaultsBtn.classList.remove("confirm-pending");
+  }
+
+  function restoreAllDefaults() {
+    // Clear all settings from localStorage
+    Object.values(STORAGE_KEYS).forEach(function (key) {
+      if (key !== STORAGE_KEYS.FAVORITES) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Clear background image from chrome.storage.local
+    saveBgImage("");
+    // Re-apply all settings with defaults
+    applyThemeSettings();
+    applyBackground();
+    applyBackgroundBrightness();
+    applyClockSettings();
+    applyFontSettings();
+    applyGeneralSettings();
+  }
+
+  restoreDefaultsBtn.addEventListener("click", function () {
+    if (restoreConfirmPending) {
+      resetConfirmState();
+      restoreAllDefaults();
+    } else {
+      restoreConfirmPending = true;
+      restoreDefaultsBtn.textContent = "Click again to confirm";
+      restoreDefaultsBtn.classList.add("confirm-pending");
+      restoreConfirmTimer = setTimeout(resetConfirmState, 3000);
     }
   });
 
@@ -607,5 +791,6 @@
   applyBackgroundBrightness();
   applyClockSettings();
   applyFontSettings();
+  applyGeneralSettings();
   renderFavorites();
 })();

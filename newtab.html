@@ -63,6 +63,43 @@
       </div>
       <div class="settings-body">
         <details class="settings-section" open>
+          <summary>General</summary>
+          <div class="settings-section-content">
+            <div class="setting-group">
+              <label for="tab-name">Tab Name</label>
+              <div class="input-row">
+                <input
+                  type="text"
+                  id="tab-name"
+                  class="text-input"
+                  placeholder="New Tab"
+                  maxlength="60"
+                />
+                <button id="apply-tab-name" class="btn">Apply</button>
+              </div>
+            </div>
+            <div class="setting-group">
+              <label for="favicon-url">Favicon URL</label>
+              <div class="input-row">
+                <input
+                  type="url"
+                  id="favicon-url"
+                  class="text-input"
+                  placeholder="https://example.com/icon.png"
+                  aria-describedby="favicon-url-error"
+                />
+                <button id="apply-favicon" class="btn">Apply</button>
+              </div>
+              <div class="input-row">
+                <input type="file" id="favicon-file" class="text-input file-input" accept="image/*" />
+              </div>
+              <span id="favicon-url-error" class="field-error" aria-live="polite"></span>
+              <button id="clear-favicon" class="btn btn-ghost">Reset Favicon</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="settings-section">
           <summary>Background</summary>
           <div class="settings-section-content">
             <div class="setting-group">
@@ -152,6 +189,9 @@
             <button id="apply-font" class="btn">Apply Font</button>
           </div>
         </details>
+      </div>
+      <div class="settings-footer">
+        <button id="restore-defaults" class="btn btn-restore">Restore Defaults</button>
       </div>
     </aside>
 
