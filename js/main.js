@@ -53,6 +53,34 @@
   setInterval(updateClock, 1000);
 
   /* ── Background ────────────────────────────────────────────── */
+
+  /**
+   * Validate that a URL has an http/https scheme and return it, or null if invalid.
+   * This prevents CSS injection via crafted url() values.
+   */
+  function sanitizeImageUrl(raw) {
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+      return parsed.href;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /**
+   * Apply a validated image URL as the background using JSON.stringify to safely
+   * quote the URL inside a CSS url() value, preventing CSS injection.
+   */
+  function setBodyBgImage(safeUrl) {
+    document.body.style.backgroundImage = "";
+    if (safeUrl) {
+      // JSON.stringify wraps the URL in double-quotes and escapes any embedded
+      // double-quotes or backslashes, making it safe for CSS url() values.
+      document.body.style.backgroundImage = "url(" + JSON.stringify(safeUrl) + ")";
+    }
+  }
+
   function applyBackground() {
     const color = localStorage.getItem(STORAGE_KEYS.BG_COLOR) || "#0f172a";
     const image = localStorage.getItem(STORAGE_KEYS.BG_IMAGE) || "";
@@ -61,7 +89,7 @@
     bgColorInput.value = color;
 
     if (image) {
-      document.body.style.backgroundImage = `url('${image}')`;
+      setBodyBgImage(image);
       bgImageInput.value = image;
     } else {
       document.body.style.backgroundImage = "none";
@@ -79,10 +107,15 @@
   });
 
   applyBgBtn.addEventListener("click", function () {
-    const url = bgImageInput.value.trim();
-    if (!url) return;
-    localStorage.setItem(STORAGE_KEYS.BG_IMAGE, url);
-    document.body.style.backgroundImage = `url('${url}')`;
+    const raw = bgImageInput.value.trim();
+    if (!raw) return;
+    const safeUrl = sanitizeImageUrl(raw);
+    if (!safeUrl) {
+      bgImageInput.focus();
+      return;
+    }
+    localStorage.setItem(STORAGE_KEYS.BG_IMAGE, safeUrl);
+    setBodyBgImage(safeUrl);
   });
 
   clearBgBtn.addEventListener("click", function () {
