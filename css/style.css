@@ -376,7 +376,6 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.03);
-  overflow: hidden;
 }
 
 .settings-section > summary {
