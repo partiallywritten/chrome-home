@@ -95,7 +95,7 @@
       setBodyBgImage(image);
       bgImageInput.value = image;
     } else {
-      document.body.style.backgroundImage = "none";
+      document.body.style.backgroundImage = "";
       bgImageInput.value = "";
     }
   }
@@ -130,7 +130,7 @@
     bgImageInput.value = "";
     bgImageInput.removeAttribute("aria-invalid");
     bgImageError.textContent = "";
-    document.body.style.backgroundImage = "none";
+    document.body.style.backgroundImage = "";
   });
 
   bgImageInput.addEventListener("input", function () {
@@ -189,7 +189,8 @@
 
     const removeBtn = document.createElement("button");
     removeBtn.className = "fav-remove";
-    removeBtn.title = "Remove";
+    removeBtn.title = "Remove " + fav.name;
+    removeBtn.setAttribute("aria-label", "Remove " + fav.name);
     removeBtn.textContent = "×";
     removeBtn.addEventListener("click", function (e) {
       e.preventDefault();
