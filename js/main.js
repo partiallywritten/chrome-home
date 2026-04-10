@@ -24,12 +24,15 @@
   const closeSettings = document.getElementById("close-settings");
   const bgColorInput = document.getElementById("bg-color");
   const bgImageInput = document.getElementById("bg-image");
+  const bgImageError = document.getElementById("bg-image-error");
   const applyBgBtn = document.getElementById("apply-bg");
   const clearBgBtn = document.getElementById("clear-bg");
   const modalOverlay = document.getElementById("modal-overlay");
   const modalTitle = document.getElementById("modal-title");
   const favNameInput = document.getElementById("fav-name");
+  const favNameError = document.getElementById("fav-name-error");
   const favUrlInput = document.getElementById("fav-url");
+  const favUrlError = document.getElementById("fav-url-error");
   const modalCancel = document.getElementById("modal-cancel");
   const modalSave = document.getElementById("modal-save");
 
@@ -111,9 +114,13 @@
     if (!raw) return;
     const safeUrl = sanitizeImageUrl(raw);
     if (!safeUrl) {
+      bgImageInput.setAttribute("aria-invalid", "true");
+      bgImageError.textContent = "Please enter a valid http or https image URL.";
       bgImageInput.focus();
       return;
     }
+    bgImageInput.removeAttribute("aria-invalid");
+    bgImageError.textContent = "";
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE, safeUrl);
     setBodyBgImage(safeUrl);
   });
@@ -121,7 +128,16 @@
   clearBgBtn.addEventListener("click", function () {
     localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
     bgImageInput.value = "";
+    bgImageInput.removeAttribute("aria-invalid");
+    bgImageError.textContent = "";
     document.body.style.backgroundImage = "none";
+  });
+
+  bgImageInput.addEventListener("input", function () {
+    if (bgImageInput.getAttribute("aria-invalid")) {
+      bgImageInput.removeAttribute("aria-invalid");
+      bgImageError.textContent = "";
+    }
   });
 
   /* ── Favorites ─────────────────────────────────────────────── */
@@ -240,6 +256,10 @@
     modalTitle.textContent = "Add Favorite";
     favNameInput.value = "";
     favUrlInput.value = "";
+    favNameInput.removeAttribute("aria-invalid");
+    favUrlInput.removeAttribute("aria-invalid");
+    favNameError.textContent = "";
+    favUrlError.textContent = "";
     modalOverlay.classList.remove("hidden");
     favNameInput.focus();
   }
@@ -259,7 +279,15 @@
     const name = favNameInput.value.trim();
     const url = favUrlInput.value.trim();
 
+    // Reset errors
+    favNameInput.removeAttribute("aria-invalid");
+    favUrlInput.removeAttribute("aria-invalid");
+    favNameError.textContent = "";
+    favUrlError.textContent = "";
+
     if (!name) {
+      favNameInput.setAttribute("aria-invalid", "true");
+      favNameError.textContent = "Please enter a name.";
       favNameInput.focus();
       return;
     }
@@ -268,6 +296,8 @@
     const normalizedUrl = url && !url.includes("://") ? "https://" + url : url;
 
     if (!normalizedUrl) {
+      favUrlInput.setAttribute("aria-invalid", "true");
+      favUrlError.textContent = "Please enter a URL.";
       favUrlInput.focus();
       return;
     }
@@ -275,12 +305,24 @@
     try {
       new URL(normalizedUrl); // validate
     } catch (_) {
+      favUrlInput.setAttribute("aria-invalid", "true");
+      favUrlError.textContent = "Please enter a valid URL (e.g. https://example.com).";
       favUrlInput.focus();
       return;
     }
 
     addFavorite(name, normalizedUrl);
     closeModal();
+  });
+
+  // Clear individual field errors while the user edits
+  favNameInput.addEventListener("input", function () {
+    favNameInput.removeAttribute("aria-invalid");
+    favNameError.textContent = "";
+  });
+  favUrlInput.addEventListener("input", function () {
+    favUrlInput.removeAttribute("aria-invalid");
+    favUrlError.textContent = "";
   });
 
   // Allow Enter to save from the modal inputs

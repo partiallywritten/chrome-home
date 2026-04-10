@@ -405,6 +405,17 @@ body {
   margin-top: 0.25rem;
 }
 
+/* ── Field error messages ─────────────────────────────────────── */
+.field-error {
+  font-size: 0.75rem;
+  color: var(--danger);
+  min-height: 1em;
+}
+
+.text-input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .settings-panel {
