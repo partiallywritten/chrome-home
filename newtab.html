@@ -41,7 +41,7 @@
         </form>
       </section>
 
-      <section class="favorites-section">
+      <section id="favorites-section" class="favorites-section">
         <div id="favorites-grid" class="favorites-grid"></div>
         <button id="add-btn" class="add-btn" title="Add favorite site" aria-label="Add favorite site">+</button>
       </section>
@@ -106,6 +106,15 @@
                 <input type="file" id="favicon-file" class="text-input file-input" accept="image/*" />
               </div>
               <span id="favicon-url-error" class="field-error" aria-live="polite"></span>
+            </div>
+            <div class="setting-group">
+              <div class="toggle-row">
+                <span class="setting-group-label">Show Favorites</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="favorites-enabled-toggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
             </div>
           </div>
         </details>

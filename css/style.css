@@ -182,6 +182,10 @@ body {
   gap: 0.95rem;
 }
 
+.favorites-section.hidden {
+  display: none;
+}
+
 .favorites-grid {
   display: flex;
   flex-wrap: wrap;

@@ -21,6 +21,7 @@ var DEFAULTS = {
 
 var STORAGE_KEYS = {
     FAVORITES: "ch_favorites",
+    FAVORITES_ENABLED: "ch_favorites_enabled",
     BG_COLOR: "ch_bg_color",
     SURFACE_COLOR: "ch_surface_color",
     BG_IMAGE: "ch_bg_image",
@@ -291,6 +292,15 @@ function applySearchSettings() {
     if (searchUrlInput) {
         searchUrlInput.value = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || "";
     }
+}
+
+function applyFavoritesEnabled() {
+    var favoritesSection = document.getElementById("favorites-section");
+    var favoritesToggle = document.getElementById("favorites-enabled-toggle");
+    var enabled = localStorage.getItem(STORAGE_KEYS.FAVORITES_ENABLED) !== "false";
+
+    if (favoritesToggle) favoritesToggle.checked = enabled;
+    if (favoritesSection) favoritesSection.classList.toggle("hidden", !enabled);
 }
 
 // --- Favorites ---

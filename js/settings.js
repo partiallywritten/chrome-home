@@ -25,6 +25,8 @@ var bgBrightnessInput = document.getElementById("bg-brightness");
 var bgImageCapSelect = document.getElementById("bg-image-cap");
 var bgImageToggle = document.getElementById("bg-image-toggle");
 
+var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
+
 var clockSizeInput = document.getElementById("clock-size");
 var clockXInput = document.getElementById("clock-x");
 var clockYInput = document.getElementById("clock-y");
@@ -573,6 +575,12 @@ bgImageToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_ENABLED, this.checked ? "true" : "false");
     markUserTheme();
     applyBackground();
+});
+
+// Favorites Controls
+favoritesEnabledToggle.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_ENABLED, this.checked ? "true" : "false");
+    applyFavoritesEnabled();
 });
 
 bgBrightnessInput.addEventListener("input", function() {
