@@ -48,6 +48,13 @@ var clearFaviconBtn = document.getElementById("clear-favicon");
 var restoreDefaultsBtn = document.getElementById("restore-defaults");
 var exportThemeBtn = document.getElementById("export-theme-btn");
 
+var searchForm = document.getElementById("search-form");
+var searchInput = document.getElementById("search-input");
+var searchUrlInput = document.getElementById("search-url");
+var searchUrlError = document.getElementById("search-url-error");
+var applySearchUrlBtn = document.getElementById("apply-search-url");
+var clearSearchUrlBtn = document.getElementById("clear-search-url");
+
 // --- Settings-only Utilities ---
 
 function compressImage(dataUrl, maxWidth, maxHeight, quality, callback) {
@@ -257,6 +264,7 @@ function restoreAllDefaults() {
     applyClockSettings();
     applyFontSettings();
     applyGeneralSettings();
+    applySearchSettings();
     applyThemesEnabledSetting();
     renderThemeActiveState(0);
 }
@@ -440,6 +448,49 @@ clearFaviconBtn.addEventListener("click", function() {
     setFavicon("");
 });
 
+// Search Form Submission
+searchForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    var query = searchInput.value.trim();
+    if (!query) return;
+    var template = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || DEFAULTS.SEARCH_URL;
+    window.location.href = template.replace("{query}", encodeURIComponent(query));
+});
+
+// Search URL Controls
+applySearchUrlBtn.addEventListener("click", function() {
+    var raw = searchUrlInput.value.trim();
+    if (!raw) {
+        localStorage.removeItem(STORAGE_KEYS.SEARCH_URL);
+        searchUrlInput.removeAttribute("aria-invalid");
+        searchUrlError.textContent = "";
+        return;
+    }
+    if (!raw.includes("{query}")) {
+        searchUrlInput.setAttribute("aria-invalid", "true");
+        searchUrlError.textContent = "URL must contain {query}.";
+        searchUrlInput.focus();
+        return;
+    }
+    var testUrl = sanitizeHttpUrl(raw.replace("{query}", "test"));
+    if (!testUrl) {
+        searchUrlInput.setAttribute("aria-invalid", "true");
+        searchUrlError.textContent = "Please enter a valid http or https URL containing {query}.";
+        searchUrlInput.focus();
+        return;
+    }
+    searchUrlInput.removeAttribute("aria-invalid");
+    searchUrlError.textContent = "";
+    localStorage.setItem(STORAGE_KEYS.SEARCH_URL, raw);
+});
+
+clearSearchUrlBtn.addEventListener("click", function() {
+    localStorage.removeItem(STORAGE_KEYS.SEARCH_URL);
+    searchUrlInput.value = "";
+    searchUrlInput.removeAttribute("aria-invalid");
+    searchUrlError.textContent = "";
+});
+
 // Favorites Save
 modalSave.addEventListener("click", function() {
     var name = favNameInput.value.trim();
@@ -489,6 +540,7 @@ clearErrorOnInput(favUrlInput, favUrlError);
 clearErrorOnInput(bgImageInput, bgImageError);
 clearErrorOnInput(fontUrlInput, fontUrlError);
 clearErrorOnInput(faviconUrlInput, faviconUrlError);
+clearErrorOnInput(searchUrlInput, searchUrlError);
 
 // Restore Defaults
 restoreDefaultsBtn.addEventListener("click", function() {

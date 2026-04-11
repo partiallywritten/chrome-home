@@ -29,4 +29,5 @@ applyBgImageCapSetting();
 applyClockSettings();
 applyFontSettings();
 applyGeneralSettings();
+applySearchSettings();
 renderFavorites();
