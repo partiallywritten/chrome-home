@@ -4,21 +4,37 @@ This folder contains pre-made themes for the Chrome Home extension.
 
 ---
 
+## Script load order
+
+Themes are only loaded when the theme browser toggle is enabled.  
+Scripts are loaded in this hierarchy:
+
+```
+usables.js   → reusable functions and constants
+defaults.js  → pulls stored data and applies settings on page load
+settings.js  → settings panel UI and user interactions
+theme_api.js → theme browser modal and theme preset application
+```
+
+`theme_api.js` also handles the **default theme** (id `0`) on fresh/reset loads.
+
+---
+
 ## Folder Structure
 
 ```
 themes/
   themes.json        ← Registry of all available themes
+  0/
+    theme.json       ← Default theme settings (id 0)
+    background.jpg   ← Default theme background image
   1/
-    theme.json       ← Theme settings
-    background.jpg   ← Theme background image
-  2/
     theme.json
     background.jpg
   ...
 ```
 
-Themes are numbered starting from **1**.
+Themes are numbered starting from **0**. Theme `0` is the built-in default theme.
 
 ---
 
@@ -26,15 +42,16 @@ Themes are numbered starting from **1**.
 
 The extension tracks the current configuration state via the `ch_theme` key in `localStorage`:
 
-| Value  | Meaning                                                           |
-|--------|-------------------------------------------------------------------|
-| `null` (absent) | Default state — built-in DEFAULTS applied, no custom image    |
-| `"user"` | User has manually customised settings in the settings panel   |
-| `"1"`, `"2"`, … | A named theme from the themes browser is active           |
+| Value  | Meaning                                                              |
+|--------|----------------------------------------------------------------------|
+| `null` (absent) | Default state — theme `0` is loaded and applied ephemerally  |
+| `"user"` | User has manually customised settings in the settings panel      |
+| `"0"`, `"1"`, … | A named theme from the themes browser is active              |
 
-When the user changes **any** setting in the settings panel, `ch_theme` is automatically set to `"user"`.  
-When the user selects a theme from the theme browser, `ch_theme` is set to the numeric theme ID.  
-When "Restore Defaults" is confirmed, `ch_theme` is removed (returns to `null`).
+- When the user changes **any** setting in the settings panel, `ch_theme` is automatically set to `"user"`.
+- When the user selects a theme from the theme browser, `ch_theme` is set to the numeric theme ID.
+- When "Restore Defaults" is confirmed, `ch_theme` is removed (returns to `null`).
+- On `null` state, `theme_api.js` fetches and displays **theme 0**'s background without writing to `localStorage` — the null state is re-applied on every page load.
 
 > **Note:** The `ch_theme` value is an internal implementation detail and is **not** exposed in the `theme.json` API.
 
@@ -53,14 +70,14 @@ An array of theme descriptor objects:
 
 ```json
 [
-  { "id": 1, "name": "Default" },
-  { "id": 2, "name": "My Theme" }
+  { "id": 0, "name": "Default" },
+  { "id": 1, "name": "My Theme" }
 ]
 ```
 
 | Field | Type   | Description                          |
 |-------|--------|--------------------------------------|
-| `id`  | number | Unique theme number (folder name)    |
+| `id`  | number | Unique theme number (folder name, ≥ 0) |
 | `name`| string | Display name shown in the UI         |
 
 ---
