@@ -803,6 +803,20 @@ input[type="range"] {
   gap: 0.6rem;
 }
 
+.themes-section-label {
+  grid-column: 1 / -1;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding-top: 0.4rem;
+}
+
+.themes-section-label:first-child {
+  padding-top: 0;
+}
+
 .theme-card {
   display: flex;
   flex-direction: column;

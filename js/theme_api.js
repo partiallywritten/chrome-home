@@ -89,63 +89,100 @@ function applyThemePreset(theme, themeId) {
 
 function renderThemeActiveState(activeId) {
     var cards = themesGrid.querySelectorAll(".theme-card");
-    cards.forEach(function(card) {
-        var id = Number(card.dataset.themeId);
-        card.classList.toggle("theme-card--active", id === activeId);
-        card.setAttribute("aria-pressed", id === activeId ? "true" : "false");
+    cards.forEach(function (card) {
+        var cardId = card.dataset.themeId;
+        var isActive;
+        if (activeId === null || activeId === undefined) {
+            isActive = false;
+        } else if (typeof activeId === "number") {
+            isActive = Number(cardId) === activeId;
+        } else {
+            isActive = cardId === activeId;
+        }
+        card.classList.toggle("theme-card--active", isActive);
+        card.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
+}
+
+function createThemeCard(idStr, name, isActive) {
+    var card = document.createElement("button");
+    card.className = "theme-card" + (isActive ? " theme-card--active" : "");
+    card.dataset.themeId = idStr;
+    card.setAttribute("aria-pressed", isActive ? "true" : "false");
+    card.title = name;
+
+    var thumb = document.createElement("div");
+    thumb.className = "theme-card__thumb";
+    var img = document.createElement("img");
+    img.src = "themes/" + idStr + "/background.jpg";
+    img.alt = "";
+    img.className = "theme-card__img";
+    thumb.appendChild(img);
+
+    var label = document.createElement("span");
+    label.className = "theme-card__name";
+    label.textContent = name;
+
+    card.appendChild(thumb);
+    card.appendChild(label);
+
+    card.addEventListener("click", function () {
+        fetch("themes/" + idStr + "/theme.json")
+            .then(function (r) {
+                if (!r.ok) throw new Error("Theme not found");
+                return r.json();
+            })
+            .then(function (themeData) {
+                var themeIdVal = /^chu-/.test(idStr) ? idStr : Number(idStr);
+                applyThemePreset(themeData, themeIdVal);
+            })
+            .catch(function () {
+                themesStatus.textContent = "Failed to load theme \u201c" + name + "\u201d.";
+            });
+    });
+
+    return card;
 }
 
 function renderThemeGrid(themes) {
     themesGrid.innerHTML = "";
     var storedId = localStorage.getItem(STORAGE_KEYS.THEME);
-    // null id means default theme (0) is active; "user" means no named theme is active
-    var activeId = (storedId === null) ? 0 :
-                   (storedId === "user") ? -1 :
-                   Number(storedId);
+    var activeId;
+    if (storedId === null) activeId = 0;
+    else if (storedId === "user") activeId = null;
+    else if (/^chu-/.test(storedId)) activeId = storedId;
+    else activeId = Number(storedId);
 
-    themes.forEach(function(t) {
-        // Validate that each entry has a safe non-negative integer id
-        var safeId = Math.floor(Number(t.id));
-        if (!Number.isFinite(safeId) || safeId < 0) return;
+    var includedItems = [];
+    var communityItems = [];
 
-        var card = document.createElement("button");
-        card.className = "theme-card" + (safeId === activeId ? " theme-card--active" : "");
-        card.dataset.themeId = String(safeId);
-        card.setAttribute("aria-pressed", safeId === activeId ? "true" : "false");
-        card.title = t.name;
-
-        var thumb = document.createElement("div");
-        thumb.className = "theme-card__thumb";
-        var img = document.createElement("img");
-        img.src = "themes/" + safeId + "/background.jpg";
-        img.alt = "";
-        img.className = "theme-card__img";
-        thumb.appendChild(img);
-
-        var label = document.createElement("span");
-        label.className = "theme-card__name";
-        label.textContent = t.name;
-
-        card.appendChild(thumb);
-        card.appendChild(label);
-
-        card.addEventListener("click", function() {
-            fetch("themes/" + safeId + "/theme.json")
-                .then(function(r) {
-                    if (!r.ok) throw new Error("Theme not found");
-                    return r.json();
-                })
-                .then(function(themeData) {
-                    applyThemePreset(themeData, safeId);
-                })
-                .catch(function() {
-                    themesStatus.textContent = "Failed to load theme \u201c" + t.name + "\u201d.";
-                });
-        });
-
-        themesGrid.appendChild(card);
+    themes.forEach(function (t) {
+        var id = t.id;
+        if (typeof id === "number" || (typeof id === "string" && /^\d+$/.test(id))) {
+            var safeId = Math.floor(Number(id));
+            if (!Number.isFinite(safeId) || safeId < 0) return;
+            includedItems.push({ idStr: String(safeId), name: t.name });
+        } else if (typeof id === "string" && /^chu-[a-zA-Z0-9_-]+$/.test(id)) {
+            communityItems.push({ idStr: id, name: t.name });
+        }
     });
+
+    function appendSection(label, items) {
+        if (!items.length) return;
+        var sectionLabel = document.createElement("p");
+        sectionLabel.className = "themes-section-label";
+        sectionLabel.textContent = label;
+        themesGrid.appendChild(sectionLabel);
+        items.forEach(function (item) {
+            var isActive = activeId === null ? false :
+                           typeof activeId === "number" ? Number(item.idStr) === activeId :
+                           item.idStr === activeId;
+            themesGrid.appendChild(createThemeCard(item.idStr, item.name, isActive));
+        });
+    }
+
+    appendSection("Included", includedItems);
+    appendSection("Community", communityItems);
 }
 
 function loadThemesRegistry() {

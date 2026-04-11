@@ -32,10 +32,13 @@ themes/
   1/
     theme.json
     background.jpg
+  chu-forest/
+    theme.json       ← Community theme (id "chu-forest")
+    background.jpg
   ...
 ```
 
-Themes are numbered starting from **0**. Theme `0` is the built-in default.
+Themes are identified by their `id` in `themes.json`. The id determines both the folder name and which section of the theme browser the theme appears in. See **Id Syntax** below.
 
 ---
 
@@ -57,12 +60,37 @@ The extension tracks the active configuration state via the `ch_theme` key in `l
 
 ---
 
+## Id Syntax
+
+The `id` field in `themes.json` determines both the folder name and which section the theme appears in within the theme browser.
+
+| Id type | Example | Section | Folder |
+|---------|---------|---------|--------|
+| Non-negative integer | `0`, `1`, `2` | **Included** | `themes/0/`, `themes/1/`, … |
+| String prefixed `chu-` | `"chu-forest"` | **Community** | `themes/chu-forest/` |
+
+- **Included** themes (numeric ids) are reserved for themes bundled with the extension.  
+  Theme `0` is always the built-in default applied on first launch.
+- **Community** themes (ids starting with `"chu-"`) are user-contributed or externally added themes. The `chu-` prefix is followed by a slug containing only letters, digits, hyphens, and underscores (e.g. `"chu-dark-ocean"`).
+- Any entry with an id that does not match either rule is silently ignored by the theme browser.
+
+---
+
 ## Adding a New Theme
+
+### Adding an Included theme (numeric id)
 
 1. Create a new numbered folder (e.g. `themes/2/`).
 2. Add a `background.jpg` — the background image for the theme.
 3. Add a `theme.json` — see schema below.
-4. Register the theme in `themes/themes.json` by appending an entry.
+4. Register the theme in `themes/themes.json` by appending `{ "id": 2, "name": "My Theme" }`.
+
+### Adding a Community theme (chu- id)
+
+1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
+2. Create the folder `themes/chu-dark-ocean/`.
+3. Add a `background.jpg` and a `theme.json`.
+4. Register the theme in `themes/themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
 
 ### `themes/themes.json` — Registry
 
@@ -71,14 +99,15 @@ An array of theme descriptor objects:
 ```json
 [
   { "id": 0, "name": "Default" },
-  { "id": 1, "name": "My Theme" }
+  { "id": 1, "name": "My Theme" },
+  { "id": "chu-forest", "name": "Forest" }
 ]
 ```
 
-| Field  | Type   | Required | Description                            |
-|--------|--------|----------|----------------------------------------|
-| `id`   | number | yes      | Unique theme index (≥ 0, matches folder name) |
-| `name` | string | yes      | Display name shown in the theme browser |
+| Field  | Type             | Required | Description                                                                 |
+|--------|------------------|----------|-----------------------------------------------------------------------------|
+| `id`   | number or string | yes      | Unique theme id. A non-negative integer for **Included** themes; a string starting with `"chu-"` (followed by `[a-zA-Z0-9_-]+`) for **Community** themes. Must match the folder name exactly. |
+| `name` | string           | yes      | Display name shown in the theme browser |
 
 ---
 

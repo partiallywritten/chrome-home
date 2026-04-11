@@ -168,11 +168,114 @@ function applyLocalFaviconFile(file) {
     });
 }
 
+// --- ZIP Builder ---
+
+var _crc32Table = (function () {
+    var table = new Int32Array(256);
+    for (var i = 0; i < 256; i++) {
+        var c = i;
+        for (var j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        table[i] = c;
+    }
+    return table;
+}());
+
+function crc32(data) {
+    var crc = -1;
+    for (var i = 0; i < data.length; i++) {
+        crc = (crc >>> 8) ^ _crc32Table[(crc ^ data[i]) & 0xFF];
+    }
+    return (crc ^ -1) >>> 0;
+}
+
+function buildZipBytes(files) {
+    var encoder = new TextEncoder();
+    var localParts = [];
+    var centralParts = [];
+    var offset = 0;
+
+    files.forEach(function (file) {
+        var nameBytes = encoder.encode(file.name);
+        var data = file.data;
+        var checksum = crc32(data);
+        var size = data.length;
+
+        var local = new Uint8Array(30 + nameBytes.length);
+        var lv = new DataView(local.buffer);
+        lv.setUint32(0, 0x04034b50, true);
+        lv.setUint16(4, 20, true);
+        lv.setUint16(6, 0, true);
+        lv.setUint16(8, 0, true);
+        lv.setUint16(10, 0, true);
+        lv.setUint16(12, 0, true);
+        lv.setUint32(14, checksum, true);
+        lv.setUint32(18, size, true);
+        lv.setUint32(22, size, true);
+        lv.setUint16(26, nameBytes.length, true);
+        lv.setUint16(28, 0, true);
+        local.set(nameBytes, 30);
+        localParts.push(local, data);
+
+        var central = new Uint8Array(46 + nameBytes.length);
+        var cv = new DataView(central.buffer);
+        cv.setUint32(0, 0x02014b50, true);
+        cv.setUint16(4, 20, true);
+        cv.setUint16(6, 20, true);
+        cv.setUint16(8, 0, true);
+        cv.setUint16(10, 0, true);
+        cv.setUint16(12, 0, true);
+        cv.setUint16(14, 0, true);
+        cv.setUint32(16, checksum, true);
+        cv.setUint32(20, size, true);
+        cv.setUint32(24, size, true);
+        cv.setUint16(28, nameBytes.length, true);
+        cv.setUint16(30, 0, true);
+        cv.setUint16(32, 0, true);
+        cv.setUint16(34, 0, true);
+        cv.setUint16(36, 0, true);
+        cv.setUint32(38, 0, true);
+        cv.setUint32(42, offset, true);
+        central.set(nameBytes, 46);
+        centralParts.push(central);
+
+        offset += 30 + nameBytes.length + size;
+    });
+
+    var centralStart = offset;
+    var centralSize = centralParts.reduce(function (s, p) { return s + p.length; }, 0);
+
+    var eocd = new Uint8Array(22);
+    var ev = new DataView(eocd.buffer);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(4, 0, true);
+    ev.setUint16(6, 0, true);
+    ev.setUint16(8, files.length, true);
+    ev.setUint16(10, files.length, true);
+    ev.setUint32(12, centralSize, true);
+    ev.setUint32(16, centralStart, true);
+    ev.setUint16(20, 0, true);
+
+    var allParts = localParts.concat(centralParts).concat([eocd]);
+    var totalLen = allParts.reduce(function (s, p) { return s + p.length; }, 0);
+    var result = new Uint8Array(totalLen);
+    var pos = 0;
+    allParts.forEach(function (p) { result.set(p, pos); pos += p.length; });
+    return result;
+}
+
+function dataUrlToBytes(dataUrl) {
+    var comma = dataUrl.indexOf(",");
+    var base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+    var binary = atob(base64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+}
+
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
-    exportThemeBtn.classList.toggle("hidden", !isUser);
+    exportThemeBtn.classList.toggle("hidden", localStorage.getItem(STORAGE_KEYS.THEME) !== "user");
 }
 
 function markUserTheme() {
@@ -182,8 +285,7 @@ function markUserTheme() {
 
 function exportUserTheme() {
     var theme = {
-        id: "user",
-        name: "User",
+        name: "User Theme",
         bgColor: localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR,
         highlightColor: localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR,
         textColor: localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR,
@@ -197,16 +299,46 @@ function exportUserTheme() {
         tabName: localStorage.getItem(STORAGE_KEYS.TAB_NAME) || "",
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
-    var json = JSON.stringify(theme, null, 2);
-    var blob = new Blob([json], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "user-theme.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
+    var fileName = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0") + ".zip";
+
+    getBgImage(function (bgImage) {
+        function buildAndDownload(bgBytes) {
+            var files = [{ name: "theme.json", data: jsonBytes }];
+            if (bgBytes) files.push({ name: "background.jpg", data: bgBytes });
+            var zipBytes = buildZipBytes(files);
+            var blob = new Blob([zipBytes], { type: "application/zip" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        if (!bgImage) {
+            buildAndDownload(null);
+            return;
+        }
+        if (bgImage.startsWith("data:image/")) {
+            buildAndDownload(dataUrlToBytes(bgImage));
+            return;
+        }
+        var safeUrl = sanitizeHttpUrl(bgImage);
+        if (!safeUrl) {
+            buildAndDownload(null);
+            return;
+        }
+        fetch(safeUrl)
+            .then(function (r) {
+                if (!r.ok) throw new Error("Fetch failed");
+                return r.arrayBuffer();
+            })
+            .then(function (buf) { buildAndDownload(new Uint8Array(buf)); })
+            .catch(function () { buildAndDownload(null); });
+    });
 }
 
 function openSettings() {
