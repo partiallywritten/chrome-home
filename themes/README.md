@@ -135,6 +135,7 @@ An empty string (`""`) for a string field clears/resets that setting.
   "name": "My Theme",
 
   "bgColor": "#003056",
+  "surfaceColor": "#003056",
   "highlightColor": "#be9da8",
   "textColor": "#eeb8b7",
 
@@ -159,6 +160,7 @@ An empty string (`""`) for a string field clears/resets that setting.
 |------------------|------------------|-----------|-----------------------------------------------------------------------------|
 | `name`           | string           | —         | Human-readable theme name (informational only, not stored to localStorage)  |
 | `bgColor`        | CSS hex color    | `#003056` | Page background color (visible when no image is set, or behind the image)   |
+| `surfaceColor`   | CSS hex color    | `#003056` | Element background color used for panels, search bar, and favorites         |
 | `highlightColor` | CSS hex color    | `#be9da8` | Accent / highlight color used for interactive elements                      |
 | `textColor`      | CSS hex color    | `#eeb8b7` | Primary text color                                                          |
 | `clockSize`      | numeric string   | `"8"`     | Clock font size in `rem` units (range: `2`–`14`)                            |

@@ -1,6 +1,7 @@
 {
   "name": "Default",
   "bgColor": "#002b4e",
+  "surfaceColor": "#002b4e",
   "highlightColor": "#d4b5c7",
   "textColor": "#b6a8c8",
   "clockSize": "4",
