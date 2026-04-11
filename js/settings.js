@@ -383,23 +383,22 @@ function resetConfirmState() {
 }
 
 function restoreAllDefaults() {
-    Object.values(STORAGE_KEYS).forEach(function(key) {
-        if (key !== STORAGE_KEYS.FAVORITES) {
-            localStorage.removeItem(key);
-        }
-    });
-    saveBgImage("");
-    closeThemesOverlay();
-    applyThemeSettings();
-    applyBackground();
-    applyBackgroundBrightness();
-    applyBgImageCapSetting();
-    applyClockSettings();
-    applyFontSettings();
-    applyGeneralSettings();
-    applySearchSettings();
-    applyThemesEnabledSetting();
-    renderThemeActiveState(0);
+    fetch("themes/0/theme.json")
+        .then(function(r) {
+            if (!r.ok) throw new Error("Not found");
+            return r.json();
+        })
+        .then(function(themeData) {
+            applyThemePreset(themeData, 0);
+            closeThemesOverlay();
+            syncExportBtnVisibility();
+        })
+        .catch(function() {
+            // theme.json missing — at minimum record the active theme id
+            localStorage.setItem(STORAGE_KEYS.THEME, "0");
+            closeThemesOverlay();
+            syncExportBtnVisibility();
+        });
 }
 
 // --- Event Listeners ---

@@ -277,6 +277,22 @@ function appendCommunityThemes(items) {
     });
 }
 
+function removeCommunityThemesFromGrid() {
+    var communityLabel = null;
+    var labels = themesGrid.querySelectorAll(".themes-section-label");
+    labels.forEach(function(label) {
+        if (label.textContent === "Community") communityLabel = label;
+    });
+    if (!communityLabel) return;
+    var sibling = communityLabel.nextElementSibling;
+    while (sibling && !sibling.classList.contains("themes-section-label")) {
+        var next = sibling.nextElementSibling;
+        sibling.remove();
+        sibling = next;
+    }
+    communityLabel.remove();
+}
+
 function applyThemesEnabledSetting() {
     var enabled = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED) === "true";
     themesEnabledToggle.checked = enabled;
@@ -300,6 +316,8 @@ communityThemesToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED, this.checked ? "true" : "false");
     if (this.checked) {
         loadCommunityThemes();
+    } else {
+        removeCommunityThemesFromGrid();
     }
 });
 
