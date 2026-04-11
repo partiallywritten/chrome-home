@@ -300,12 +300,13 @@ function exportUserTheme() {
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
     var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
-    var fileName = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0") + ".zip";
+    var themeId = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0");
+    var fileName = themeId + ".zip";
 
     getBgImage(function (bgImage) {
         function buildAndDownload(bgBytes) {
-            var files = [{ name: "theme.json", data: jsonBytes }];
-            if (bgBytes) files.push({ name: "background.jpg", data: bgBytes });
+            var files = [{ name: themeId + "/theme.json", data: jsonBytes }];
+            if (bgBytes) files.push({ name: themeId + "/background.jpg", data: bgBytes });
             var zipBytes = buildZipBytes(files);
             var blob = new Blob([zipBytes], { type: "application/zip" });
             var url = URL.createObjectURL(blob);
