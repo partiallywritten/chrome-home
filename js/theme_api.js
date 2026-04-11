@@ -3,8 +3,7 @@
 // --- DOM Elements ---
 var browseThemesBtn = document.getElementById("browse-themes-btn");
 var themesEnabledToggle = document.getElementById("themes-enabled-toggle");
-var customThemesEnabledToggle = document.getElementById("custom-themes-toggle");
-var customThemesSetting = document.getElementById("custom-themes-setting");
+var communityThemesToggle = document.getElementById("community-themes-toggle");
 var themesOverlay = document.getElementById("themes-overlay");
 var themesGrid = document.getElementById("themes-grid");
 var themesStatus = document.getElementById("themes-status");
@@ -157,7 +156,6 @@ function renderThemeGrid(themes) {
     var activeId = getActiveThemeId();
 
     var includedItems = [];
-    var communityItems = [];
 
     themes.forEach(function (t) {
         var id = t.id;
@@ -165,8 +163,6 @@ function renderThemeGrid(themes) {
             var safeId = Math.floor(Number(id));
             if (!Number.isFinite(safeId) || safeId < 0) return;
             includedItems.push({ id: String(safeId), name: t.name });
-        } else if (typeof id === "string" && /^chu-[a-zA-Z0-9_-]+$/.test(id)) {
-            communityItems.push({ id: id, name: t.name });
         }
     });
 
@@ -182,12 +178,11 @@ function renderThemeGrid(themes) {
     }
 
     appendSection("Included", includedItems);
-    appendSection("Community", communityItems);
 }
 
 function loadThemesRegistry(onComplete) {
     themesStatus.textContent = "";
-    fetch("themes/themes.json")
+    fetch("themes/included_themes.json")
         .then(function(r) {
             if (!r.ok) throw new Error("Registry not found");
             return r.json();
@@ -210,7 +205,9 @@ function loadThemesRegistry(onComplete) {
 function openThemesOverlay() {
     themesOverlay.classList.remove("hidden");
     themesOverlay.setAttribute("aria-hidden", "false");
-    loadThemesRegistry(localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true" ? loadCommunityThemes : null);
+    var communityEnabled = localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true";
+    communityThemesToggle.checked = communityEnabled;
+    loadThemesRegistry(communityEnabled ? loadCommunityThemes : null);
 }
 
 function closeThemesOverlay() {
@@ -219,43 +216,28 @@ function closeThemesOverlay() {
 }
 
 function loadCommunityThemes() {
-    var manifest = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest)
-        ? chrome.runtime.getManifest() : {};
-    var war = manifest.web_accessible_resources || [];
-    var themeIdSet = new Set();
-    war.forEach(function(entry) {
-        var resources = Array.isArray(entry.resources) ? entry.resources : [];
-        resources.forEach(function(r) {
-            var m = /^themes\/(chu-[a-zA-Z0-9_-]+)\//.exec(r);
-            if (m) themeIdSet.add(m[1]);
-        });
-    });
-
-    var themeIds = Array.from(themeIdSet);
-    if (themeIds.length === 0) return;
-
-    var pending = themeIds.length;
-    var communityThemes = [];
-    themeIds.forEach(function(id) {
-        fetch("themes/" + id + "/theme.json")
-            .then(function(r) {
-                if (!r.ok) throw new Error("Not found");
-                return r.json();
-            })
-            .then(function(data) {
-                var name = (typeof data.name === "string" && data.name.trim())
-                    ? data.name.trim()
-                    : id.replace(/^chu-/, "");
-                communityThemes.push({ id: id, name: name });
-            })
-            .catch(function() {
-                communityThemes.push({ id: id, name: id.replace(/^chu-/, "") });
-            })
-            .finally(function() {
-                pending--;
-                if (pending === 0) appendCommunityThemes(communityThemes);
+    fetch("themes/community_themes.json")
+        .then(function(r) {
+            if (!r.ok) throw new Error("Registry not found");
+            return r.json();
+        })
+        .then(function(data) {
+            if (!Array.isArray(data)) return;
+            var items = [];
+            data.forEach(function(t) {
+                var id = t.id;
+                if (typeof id === "string" && /^chu-[a-zA-Z0-9_-]+$/.test(id)) {
+                    var name = (typeof t.name === "string" && t.name.trim())
+                        ? t.name.trim()
+                        : id.replace(/^chu-/, "");
+                    items.push({ id: id, name: name });
+                }
             });
-    });
+            appendCommunityThemes(items);
+        })
+        .catch(function() {
+            // community_themes.json missing or invalid — nothing to append
+        });
 }
 
 function appendCommunityThemes(items) {
@@ -299,8 +281,6 @@ function applyThemesEnabledSetting() {
     var enabled = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED) === "true";
     themesEnabledToggle.checked = enabled;
     browseThemesBtn.classList.toggle("hidden", !enabled);
-    customThemesSetting.classList.toggle("hidden", !enabled);
-    customThemesEnabledToggle.checked = enabled && localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true";
 }
 
 // --- Event Listeners ---
@@ -311,15 +291,16 @@ document.getElementById("close-themes-btn").addEventListener("click", closeTheme
 themesEnabledToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.THEMES_ENABLED, this.checked ? "true" : "false");
     browseThemesBtn.classList.toggle("hidden", !this.checked);
-    customThemesSetting.classList.toggle("hidden", !this.checked);
     if (!this.checked) {
         closeThemesOverlay();
-        customThemesEnabledToggle.checked = false;
     }
 });
 
-customThemesEnabledToggle.addEventListener("change", function() {
+communityThemesToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED, this.checked ? "true" : "false");
+    if (this.checked) {
+        loadCommunityThemes();
+    }
 });
 
 // --- Initialization ---

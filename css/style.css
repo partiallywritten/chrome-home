@@ -791,6 +791,11 @@ input[type="range"] {
 }
 
 /* ── Theme grid ───────────────────────────────────────────────── */
+.themes-overlay__options {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
 .themes-status {
   font-size: 0.8rem;
   color: var(--text-muted);

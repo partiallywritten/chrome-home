@@ -187,15 +187,6 @@
                 </label>
               </div>
             </div>
-            <div class="setting-group hidden" id="custom-themes-setting">
-              <div class="toggle-row">
-                <span class="setting-group-label">Enable Custom Themes</span>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="custom-themes-toggle" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
             <div class="setting-group">
               <label for="bg-color">Background Color</label>
               <input type="color" id="bg-color" class="color-picker" value="#003056" />
@@ -269,6 +260,15 @@
         <button id="close-themes-btn" class="icon-btn" title="Close" aria-label="Close theme browser">&times;</button>
       </div>
       <div class="themes-overlay__body">
+        <div class="themes-overlay__options">
+          <div class="toggle-row">
+            <span class="setting-group-label">Enable Community Themes</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="community-themes-toggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
         <p id="themes-status" class="themes-status"></p>
         <div id="themes-grid" class="themes-grid"></div>
       </div>
