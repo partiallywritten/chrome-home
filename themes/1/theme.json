@@ -1,6 +1,7 @@
 {
   "name": "Knight in Shining Armor",
   "bgColor": "#4754a1",
+  "surfaceColor": "#4754a1",
   "highlightColor": "#73bcfb",
   "textColor": "#fde48b",
   "clockSize": "4.2",
