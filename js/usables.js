@@ -11,6 +11,7 @@ var DEFAULTS = {
     FONT_FAMILY: "\"JetBrains Mono\", \"Fira Code\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
     TAB_NAME: "",
     FAVICON: "",
+    BG_IMAGE_CAP: "1080p",
 };
 
 var STORAGE_KEYS = {
@@ -18,6 +19,7 @@ var STORAGE_KEYS = {
     BG_COLOR: "ch_bg_color",
     BG_IMAGE: "ch_bg_image",
     BG_BRIGHTNESS: "ch_bg_brightness",
+    BG_IMAGE_CAP: "ch_bg_image_cap",
     HIGHLIGHT_COLOR: "ch_highlight_color",
     TEXT_COLOR: "ch_text_color",
     CLOCK_SIZE: "ch_clock_size",
@@ -177,6 +179,11 @@ function applyBackgroundBrightness() {
     var brightnessScale = Math.max(0.05, 1 + brightnessValue / 100);
     document.getElementById("bg-brightness").value = String(brightnessValue);
     document.documentElement.style.setProperty("--bg-image-brightness", String(brightnessScale));
+}
+
+function applyBgImageCapSetting() {
+    var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    document.getElementById("bg-image-cap").value = cap;
 }
 
 function applyClockSettings() {

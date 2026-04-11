@@ -17,6 +17,7 @@ var bgImageError = document.getElementById("bg-image-error");
 var applyBgBtn = document.getElementById("apply-bg");
 var clearBgBtn = document.getElementById("clear-bg");
 var bgBrightnessInput = document.getElementById("bg-brightness");
+var bgImageCapSelect = document.getElementById("bg-image-cap");
 
 var clockSizeInput = document.getElementById("clock-size");
 var clockXInput = document.getElementById("clock-x");
@@ -122,11 +123,19 @@ function clearErrorOnInput(inputEl, errorEl) {
 
 // --- Settings-only Helpers ---
 
+function getBgImageCapDimensions() {
+    var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    if (cap === "4K") return { width: 3840, height: 2160 };
+    if (cap === "1440p") return { width: 2560, height: 1440 };
+    return { width: 1920, height: 1080 };
+}
+
 function applyLocalBackgroundFile(file) {
     readImageFile(file, bgImageError, function(dataUrl) {
         bgImageInput.value = "";
         bgImageInput.removeAttribute("aria-invalid");
-        compressImage(dataUrl, 1920, 1080, 0.8, function(compressed) {
+        var dims = getBgImageCapDimensions();
+        compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
             setBodyBgImage(compressed);
             saveBgImage(compressed);
         });
@@ -192,6 +201,7 @@ function restoreAllDefaults() {
     applyThemeSettings();
     applyBackground();
     applyBackgroundBrightness();
+    applyBgImageCapSetting();
     applyClockSettings();
     applyFontSettings();
     applyGeneralSettings();
@@ -268,6 +278,10 @@ clockYInput.addEventListener("input", function() {
 bgBrightnessInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_BRIGHTNESS, this.value);
     applyBackgroundBrightness();
+});
+
+bgImageCapSelect.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.BG_IMAGE_CAP, this.value);
 });
 
 bgFileInput.addEventListener("change", function() {

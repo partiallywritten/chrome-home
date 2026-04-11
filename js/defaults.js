@@ -25,6 +25,7 @@ updateClock();
 applyThemeSettings();
 applyBackground();
 applyBackgroundBrightness();
+applyBgImageCapSetting();
 applyClockSettings();
 applyFontSettings();
 applyGeneralSettings();
