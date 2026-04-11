@@ -88,7 +88,10 @@
               </div>
             </div>
             <div class="setting-group">
-              <label for="search-url">Search URL</label>
+              <div class="label-row">
+                <label for="search-url">Search URL</label>
+                <button id="clear-search-url" class="btn-inline-reset">reset</button>
+              </div>
               <div class="input-row">
                 <input
                   type="text"
@@ -100,10 +103,12 @@
                 <button id="apply-search-url" class="btn">Apply</button>
               </div>
               <span id="search-url-error" class="field-error" aria-live="polite"></span>
-              <button id="clear-search-url" class="btn btn-ghost">Reset to Default</button>
             </div>
             <div class="setting-group">
-              <label for="favicon-url">Favicon URL</label>
+              <div class="label-row">
+                <label for="favicon-url">Favicon URL</label>
+                <button id="clear-favicon" class="btn-inline-reset">reset</button>
+              </div>
               <div class="input-row">
                 <input
                   type="url"
@@ -118,7 +123,6 @@
                 <input type="file" id="favicon-file" class="text-input file-input" accept="image/*" />
               </div>
               <span id="favicon-url-error" class="field-error" aria-live="polite"></span>
-              <button id="clear-favicon" class="btn btn-ghost">Reset Favicon</button>
             </div>
           </div>
         </details>
@@ -136,7 +140,10 @@
               </div>
             </div>
             <div class="setting-group">
-              <label for="bg-image">Background Image URL</label>
+              <div class="label-row">
+                <label for="bg-image">Background Image URL</label>
+                <button id="clear-bg" class="btn-inline-reset">clear</button>
+              </div>
               <div class="input-row">
                 <input
                   type="url"
@@ -151,7 +158,6 @@
                 <input type="file" id="bg-file" class="text-input file-input" accept="image/*" />
               </div>
               <span id="bg-image-error" class="field-error" aria-live="polite"></span>
-              <button id="clear-bg" class="btn btn-ghost">Clear Image</button>
             </div>
             <div class="setting-group">
               <label for="bg-brightness">Image Darken/Brighten</label>

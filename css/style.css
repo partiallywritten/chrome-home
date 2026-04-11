@@ -450,6 +450,34 @@ body {
   letter-spacing: 0.09em;
 }
 
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-inline-reset {
+  padding: 0.12rem 0.38rem;
+  font-size: 0.63rem;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-inline-reset:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--surface-hover);
+}
+
 /* ── Form controls ────────────────────────────────────────────── */
 .color-picker {
   width: 100%;
