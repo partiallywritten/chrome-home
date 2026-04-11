@@ -1,5 +1,8 @@
-# Chrome Home
-A highly customizable new tab extension for chrome that I use.
+<div align="center">
+  <h1>Chrome Home</h1>
+  <img src="assets/chrome-home-preview.png" alt="Chrome Home Theme preview">
+  <p>A highly customizable new tab extension for chrome that I use.</p>
+</div>
 
 
 ## Customizations
@@ -7,6 +10,7 @@ A highly customizable new tab extension for chrome that I use.
     - Tab name
     - Search url (search engine, but using url to support custom engines)
     - Favicon
+    - Toggle on/off favorites
 - Background
     - Background color / image (can be toggled)
     - Background light
