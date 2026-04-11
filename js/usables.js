@@ -31,6 +31,9 @@ var STORAGE_KEYS = {
     FAVICON: "ch_favicon",
 };
 
+// --- Cached DOM References ---
+var docStyle = document.documentElement.style;
+
 // --- Core Utilities ---
 
 function hexToRgb(sourceHex) {
@@ -114,7 +117,7 @@ function applyCustomFont(url, family) {
         link.href = url;
         document.head.appendChild(link);
     }
-    document.documentElement.style.setProperty("--font-family", family || "inherit");
+    docStyle.setProperty("--font-family", family || "inherit");
 }
 
 function setFavicon(href) {
@@ -138,11 +141,11 @@ function applyThemeSettings() {
     var highlightColor = localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR;
     var textColor = localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR;
 
-    document.documentElement.style.setProperty("--bg-color", bgColor);
-    document.documentElement.style.setProperty("--accent", highlightColor);
-    document.documentElement.style.setProperty("--accent-hover", hexToRgba(highlightColor, 0.85));
-    document.documentElement.style.setProperty("--text", textColor);
-    document.documentElement.style.setProperty("--text-muted", hexToRgba(textColor, 0.74));
+    docStyle.setProperty("--bg-color", bgColor);
+    docStyle.setProperty("--accent", highlightColor);
+    docStyle.setProperty("--accent-hover", hexToRgba(highlightColor, 0.85));
+    docStyle.setProperty("--text", textColor);
+    docStyle.setProperty("--text-muted", hexToRgba(textColor, 0.74));
 
     document.getElementById("bg-color").value = bgColor;
     document.getElementById("highlight-color").value = highlightColor;
@@ -181,7 +184,7 @@ function applyBackgroundBrightness() {
     var parsed = Number(raw);
     var brightnessValue = Number.isFinite(parsed) ? Math.max(-100, Math.min(100, parsed)) : 0;
     document.getElementById("bg-brightness").value = String(brightnessValue);
-    document.documentElement.style.setProperty("--bg-image-brightness", String(brightnessScale(brightnessValue)));
+    docStyle.setProperty("--bg-image-brightness", String(brightnessScale(brightnessValue)));
 }
 
 function applyBgImageCapSetting() {
@@ -197,9 +200,9 @@ function applyClockSettings() {
     document.getElementById("clock-size").value = clockSize;
     document.getElementById("clock-x").value = clockX;
     document.getElementById("clock-y").value = clockY;
-    document.documentElement.style.setProperty("--clock-size", `${clockSize}rem`);
-    document.documentElement.style.setProperty("--clock-x", `${clockX}px`);
-    document.documentElement.style.setProperty("--clock-y", `${clockY}px`);
+    docStyle.setProperty("--clock-size", `${clockSize}rem`);
+    docStyle.setProperty("--clock-x", `${clockX}px`);
+    docStyle.setProperty("--clock-y", `${clockY}px`);
 }
 
 function applyFontSettings() {
@@ -213,6 +216,7 @@ function applyFontSettings() {
 function applyGeneralSettings() {
     var tabName = localStorage.getItem(STORAGE_KEYS.TAB_NAME) || DEFAULTS.TAB_NAME;
     var favicon = localStorage.getItem(STORAGE_KEYS.FAVICON) || DEFAULTS.FAVICON;
+    var faviconUrlEl = document.getElementById("favicon-url");
 
     document.getElementById("tab-name").value = tabName;
     document.title = tabName || "New Tab";
@@ -222,15 +226,15 @@ function applyGeneralSettings() {
         var safeUrl = isDataImage ? favicon : sanitizeHttpUrl(favicon);
         if (safeUrl) {
             setFavicon(safeUrl);
-            document.getElementById("favicon-url").value = isDataImage ? "" : safeUrl;
+            faviconUrlEl.value = isDataImage ? "" : safeUrl;
         } else {
             localStorage.removeItem(STORAGE_KEYS.FAVICON);
             setFavicon("");
-            document.getElementById("favicon-url").value = "";
+            faviconUrlEl.value = "";
         }
     } else {
         setFavicon("");
-        document.getElementById("favicon-url").value = "";
+        faviconUrlEl.value = "";
     }
 }
 
