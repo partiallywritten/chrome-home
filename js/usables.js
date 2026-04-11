@@ -287,7 +287,6 @@ function createFavElement(fav, index) {
     var a = document.createElement("a");
     a.href = fav.url;
     a.className = "fav-item";
-    a.title = fav.name;
 
     var faviconUrl = getFaviconUrl(fav.url);
     if (faviconUrl) {

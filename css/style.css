@@ -247,15 +247,19 @@ body {
   font-size: 0.65rem;
   border: none;
   cursor: pointer;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
   padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
 }
 
 .fav-item:hover .fav-remove {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* ── Add button ───────────────────────────────────────────────── */
@@ -349,9 +353,6 @@ body {
   min-height: 0;
   gap: 1.1rem;
   overflow-y: auto;
-}
-
-.settings-body {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(255, 255, 255, 0.08);
 }
