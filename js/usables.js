@@ -12,6 +12,7 @@ var DEFAULTS = {
     TAB_NAME: "",
     FAVICON: "",
     BG_IMAGE_CAP: "1080p",
+    SEARCH_URL: "https://www.google.com/search?q={query}",
 };
 
 var STORAGE_KEYS = {
@@ -32,6 +33,7 @@ var STORAGE_KEYS = {
     FAVICON: "ch_favicon",
     THEME: "ch_theme",
     THEMES_ENABLED: "ch_themes_enabled",
+    SEARCH_URL: "ch_search_url",
 };
 
 // --- Cached DOM References ---
@@ -250,6 +252,13 @@ function applyGeneralSettings() {
     } else {
         setFavicon("");
         faviconUrlEl.value = "";
+    }
+}
+
+function applySearchSettings() {
+    var searchUrlInput = document.getElementById("search-url");
+    if (searchUrlInput) {
+        searchUrlInput.value = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || "";
     }
 }
 
