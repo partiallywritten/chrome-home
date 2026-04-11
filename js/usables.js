@@ -167,13 +167,14 @@ function applyBackground() {
         return;
     }
 
-    // Remove disabled state immediately — CSS default image shows while async read runs
+    // Clear any previous inline style so the CSS default image shows while the async read runs
     backgroundLayer.classList.remove("bg-disabled");
     backgroundLayer.style.backgroundImage = "";
 
     getBgImage(function(image) {
         if (!image) {
             bgImageInput.value = "";
+            // No custom image — CSS default already showing, nothing more to do
             return;
         }
         var isLocalDataImage = image.startsWith("data:image/");
