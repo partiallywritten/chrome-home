@@ -18,7 +18,25 @@ themes/
   ...
 ```
 
-Themes are numbered starting from **1**. Theme 1 is the default theme.
+Themes are numbered starting from **1**.
+
+---
+
+## State / `id` system
+
+The extension tracks the current configuration state via the `ch_theme` key in `localStorage`:
+
+| Value  | Meaning                                                           |
+|--------|-------------------------------------------------------------------|
+| `null` (absent) | Default state — built-in DEFAULTS applied, no custom image    |
+| `"user"` | User has manually customised settings in the settings panel   |
+| `"1"`, `"2"`, … | A named theme from the themes browser is active           |
+
+When the user changes **any** setting in the settings panel, `ch_theme` is automatically set to `"user"`.  
+When the user selects a theme from the theme browser, `ch_theme` is set to the numeric theme ID.  
+When "Restore Defaults" is confirmed, `ch_theme` is removed (returns to `null`).
+
+> **Note:** The `ch_theme` value is an internal implementation detail and is **not** exposed in the `theme.json` API.
 
 ---
 
@@ -68,7 +86,6 @@ All fields are optional. Omitted fields keep the user's existing value.
 
   "bgBrightness": "0",
   "bgImageEnabled": true,
-  "bgImageCap": "1080p",
 
   "tabName": "",
   "favicon": ""
@@ -90,9 +107,10 @@ All fields are optional. Omitted fields keep the user's existing value.
 | `fontFamily`     | CSS font stack   | CSS `font-family` value applied to the whole page                          |
 | `bgBrightness`   | numeric string   | Background image brightness adjustment (range: `-100`–`100`, default `"0"`) |
 | `bgImageEnabled` | boolean          | Whether the background image is shown (`true`) or hidden (`false`)         |
-| `bgImageCap`     | `"default"` \| `"1080p"` \| `"1440p"` \| `"4K"` | Maximum resolution cap when processing the background image. `"default"` saves the image without any scaling or re-encoding. |
 | `tabName`        | string           | Browser tab title. Empty string = `"New Tab"`                             |
 | `favicon`        | URL string       | URL of a custom favicon image. Empty string = browser default              |
+
+> **Not in API:** `bgImageCap` is a user-only preference controlled via the Background settings panel. It is intentionally excluded from `theme.json` so that themes always respect the user's chosen image quality cap.
 
 ### `background.jpg`
 

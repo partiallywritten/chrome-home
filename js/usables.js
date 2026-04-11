@@ -69,8 +69,6 @@ function sanitizeHttpUrl(raw) {
 
 // --- Background Helpers ---
 
-var DEFAULT_BG_IMAGE = "img/default.jpg";
-
 function getBgImage(callback) {
     chrome.storage.local.get([STORAGE_KEYS.BG_IMAGE], function(result) {
         var stored = result[STORAGE_KEYS.BG_IMAGE];

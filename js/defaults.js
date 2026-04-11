@@ -21,6 +21,11 @@ function updateClock() {
 }
 
 // --- Initialization ---
+// If no theme id is set (null), clear any stale stored background image so the
+// extension starts with a clean default state (solid background color only).
+if (localStorage.getItem(STORAGE_KEYS.THEME) === null) {
+    saveBgImage("");
+}
 updateClock();
 applyThemeSettings();
 applyBackground();
