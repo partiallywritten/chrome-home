@@ -164,8 +164,8 @@ An empty string (`""`) for a string field clears/resets that setting.
 | `highlightColor` | CSS hex color    | `#be9da8` | Accent / highlight color used for interactive elements                      |
 | `textColor`      | CSS hex color    | `#eeb8b7` | Primary text color                                                          |
 | `clockSize`      | numeric string   | `"8"`     | Clock font size in `rem` units (range: `2`–`14`)                            |
-| `clockX`         | numeric string   | `"0"`     | Horizontal offset of the clock in pixels (range: `-300`–`300`)              |
-| `clockY`         | numeric string   | `"0"`     | Vertical offset of the clock in pixels (range: `-300`–`300`)                |
+| `clockX`         | numeric string   | `"0"`     | Horizontal offset of the clock in `dvw` units (range: `-50`–`50`)           |
+| `clockY`         | numeric string   | `"0"`     | Vertical offset of the clock in `dvh` units (range: `-50`–`50`)             |
 | `fontUrl`        | URL string       | `""`      | URL of a CSS font stylesheet (e.g. Google Fonts). `""` = no custom font     |
 | `fontFamily`     | CSS font stack   | monospace stack | CSS `font-family` value applied to the whole page                    |
 | `bgBrightness`   | numeric string   | `"0"`     | Background brightness adjustment (range: `-100`–`100`)                      |

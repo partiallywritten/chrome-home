@@ -546,12 +546,12 @@ clockSizeInput.addEventListener("input", function() {
 clockXInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
     markUserTheme();
-    docStyle.setProperty("--clock-x", `${this.value}px`);
+    docStyle.setProperty("--clock-x", `${this.value}dvw`);
 });
 clockYInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
     markUserTheme();
-    docStyle.setProperty("--clock-y", `${this.value}px`);
+    docStyle.setProperty("--clock-y", `${this.value}dvh`);
 });
 
 // Search Bar Controls
@@ -561,11 +561,11 @@ searchWidthInput.addEventListener("input", function() {
 });
 searchXInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.SEARCH_X, this.value);
-    docStyle.setProperty("--search-x", `${this.value}px`);
+    docStyle.setProperty("--search-x", `${this.value}dvw`);
 });
 searchYInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.SEARCH_Y, this.value);
-    docStyle.setProperty("--search-y", `${this.value}px`);
+    docStyle.setProperty("--search-y", `${this.value}dvh`);
 });
 
 // Background Controls

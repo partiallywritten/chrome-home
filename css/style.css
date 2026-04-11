@@ -24,11 +24,11 @@
   --transition: 0.2s ease;
   --panel-width: 360px;
   --clock-size: 8rem;
-  --clock-x: 0px;
-  --clock-y: 0px;
+  --clock-x: 0dvw;
+  --clock-y: 0dvh;
   --search-width: 560px;
-  --search-x: 0px;
-  --search-y: 0px;
+  --search-x: 0dvw;
+  --search-y: 0dvh;
   --font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
