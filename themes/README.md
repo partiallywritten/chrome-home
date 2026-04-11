@@ -87,11 +87,34 @@ The `id` field in `themes.json` determines both the folder name and which sectio
 
 ### Adding a Community theme (chu- id)
 
+There are two ways to make a community theme appear in the theme browser.
+
+#### Option A — Register in `themes.json` (manual)
+
 1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
 2. Create the folder `themes/chu-dark-ocean/`.
 3. Add a `background.jpg` and a `theme.json`.
 4. Register the theme in `themes/themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
 
+#### Option B — Auto-discovery via Custom Themes toggle (recommended for user-added themes)
+
+When the **Enable Custom Themes** toggle is turned on in the Theme settings panel, the extension automatically discovers any `chu-` prefixed theme folders declared in `web_accessible_resources` inside `manifest.json`. No entry in `themes/themes.json` is needed — that file remains exclusive to **Included** themes.
+
+1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
+2. Create the folder `themes/chu-dark-ocean/`.
+3. Add a `background.jpg` and a `theme.json` (the `name` field is used as the display name).
+4. Declare the folder in `manifest.json` under `web_accessible_resources`:
+   ```json
+   {
+     "web_accessible_resources": [
+       {
+         "resources": ["themes/chu-dark-ocean/*"],
+         "matches": ["<all_urls>"]
+       }
+     ]
+   }
+   ```
+5. Enable the **Enable Custom Themes** toggle in the Theme settings panel. The community theme will appear lazily in the **Community** section when the theme browser is opened.
 ### `themes/themes.json` — Registry
 
 An array of theme descriptor objects:
