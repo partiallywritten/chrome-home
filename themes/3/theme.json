@@ -1,0 +1,16 @@
+{
+  "name": "Asian E-girl",
+  "bgColor": "#080001",
+  "surfaceColor": "#291c21",
+  "highlightColor": "#a20129",
+  "textColor": "#b4b1b2",
+  "clockSize": "4",
+  "clockX": "0",
+  "clockY": "0",
+  "fontUrl": "https://fonts.googleapis.com/css2?family=Bebas+Neue",
+  "fontFamily": "\"Bebas Neue\", sans-serif",
+  "bgBrightness": "-60",
+  "bgImageEnabled": true,
+  "tabName": "⛓️Where are We?",
+  "favicon": ""
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Marathon Assassin Pixel",
+  "bgColor": "#c53922",
+  "surfaceColor": "#26382a",
+  "highlightColor": "#de5f2c",
+  "textColor": "#dee5c2",
+  "clockSize": "4",
+  "clockX": "0",
+  "clockY": "0",
+  "fontUrl": "https://fonts.googleapis.com/css2?family=Silkscreen&display=swap",
+  "fontFamily": "\"Silkscreen\", sans-serif",
+  "bgBrightness": "-60",
+  "bgImageEnabled": true,
+  "tabName": "Get back here!!!",
+  "favicon": ""
+}

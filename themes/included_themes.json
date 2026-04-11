@@ -1,5 +1,7 @@
 [
   { "id": 0, "name": "Default" },
   { "id": 1, "name": "Shining Knight" },
-  { "id": 2, "name": "Changli" }
+  { "id": 2, "name": "Changli" },
+  { "id": 3, "name": "E-girl" },
+  { "id": 4, "name": "Pixel Warfare" }
 ]
