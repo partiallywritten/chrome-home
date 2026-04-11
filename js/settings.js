@@ -243,9 +243,7 @@ settingsSections.forEach(function(section) {
 bgColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_COLOR, this.value);
     document.documentElement.style.setProperty("--bg-color", this.value);
-    if (!localStorage.getItem(STORAGE_KEYS.BG_IMAGE)) {
-        document.body.style.backgroundColor = this.value;
-    }
+    document.body.style.backgroundColor = this.value;
 });
 
 highlightColorInput.addEventListener("input", function() {
@@ -277,7 +275,7 @@ clockYInput.addEventListener("input", function() {
 // Background Controls
 bgBrightnessInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_BRIGHTNESS, this.value);
-    applyBackgroundBrightness();
+    document.documentElement.style.setProperty("--bg-image-brightness", String(Math.max(0.05, 1 + Number(this.value) / 100)));
 });
 
 bgImageCapSelect.addEventListener("change", function() {

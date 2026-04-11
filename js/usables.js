@@ -300,9 +300,9 @@ function createFavElement(fav, index) {
     return a;
 }
 
-function renderFavorites() {
+function renderFavorites(favorites) {
     var favGrid = document.getElementById("favorites-grid");
-    var favorites = loadFavorites();
+    if (!favorites) favorites = loadFavorites();
     favGrid.innerHTML = "";
     favorites.forEach(function(fav, index) {
         favGrid.appendChild(createFavElement(fav, index));
@@ -313,12 +313,12 @@ function removeFavorite(index) {
     var favorites = loadFavorites();
     favorites.splice(index, 1);
     saveFavorites(favorites);
-    renderFavorites();
+    renderFavorites(favorites);
 }
 
 function addFavorite(name, url) {
     var favorites = loadFavorites();
     favorites.push({ name: name, url: url });
     saveFavorites(favorites);
-    renderFavorites();
+    renderFavorites(favorites);
 }
