@@ -242,42 +242,40 @@ settingsSections.forEach(function(section) {
 // Color Inputs
 bgColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_COLOR, this.value);
-    document.documentElement.style.setProperty("--bg-color", this.value);
-    if (!localStorage.getItem(STORAGE_KEYS.BG_IMAGE)) {
-        document.body.style.backgroundColor = this.value;
-    }
+    docStyle.setProperty("--bg-color", this.value);
+    document.body.style.backgroundColor = this.value;
 });
 
 highlightColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.HIGHLIGHT_COLOR, this.value);
-    document.documentElement.style.setProperty("--accent", this.value);
-    document.documentElement.style.setProperty("--accent-hover", hexToRgba(this.value, 0.85));
+    docStyle.setProperty("--accent", this.value);
+    docStyle.setProperty("--accent-hover", hexToRgba(this.value, 0.85));
 });
 
 textColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.TEXT_COLOR, this.value);
-    document.documentElement.style.setProperty("--text", this.value);
-    document.documentElement.style.setProperty("--text-muted", hexToRgba(this.value, 0.74));
+    docStyle.setProperty("--text", this.value);
+    docStyle.setProperty("--text-muted", hexToRgba(this.value, 0.74));
 });
 
 // Clock Inputs
 clockSizeInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_SIZE, this.value);
-    document.documentElement.style.setProperty("--clock-size", `${this.value}rem`);
+    docStyle.setProperty("--clock-size", `${this.value}rem`);
 });
 clockXInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
-    document.documentElement.style.setProperty("--clock-x", `${this.value}px`);
+    docStyle.setProperty("--clock-x", `${this.value}px`);
 });
 clockYInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
-    document.documentElement.style.setProperty("--clock-y", `${this.value}px`);
+    docStyle.setProperty("--clock-y", `${this.value}px`);
 });
 
 // Background Controls
 bgBrightnessInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_BRIGHTNESS, this.value);
-    applyBackgroundBrightness();
+    docStyle.setProperty("--bg-image-brightness", String(brightnessScale(this.value)));
 });
 
 bgImageCapSelect.addEventListener("change", function() {
