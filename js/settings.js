@@ -275,8 +275,7 @@ function dataUrlToBytes(dataUrl) {
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    var themeId = localStorage.getItem(STORAGE_KEYS.THEME);
-    exportThemeBtn.classList.toggle("hidden", themeId === null);
+    exportThemeBtn.classList.toggle("hidden", localStorage.getItem(STORAGE_KEYS.THEME) !== "user");
 }
 
 function markUserTheme() {
@@ -285,8 +284,6 @@ function markUserTheme() {
 }
 
 function exportUserTheme() {
-    var themeId = localStorage.getItem(STORAGE_KEYS.THEME) || "user";
-    var safeFileName = themeId.replace(/[^a-zA-Z0-9_\-]/g, "_") + ".zip";
     var theme = {
         name: "User Theme",
         bgColor: localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR,
@@ -303,6 +300,7 @@ function exportUserTheme() {
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
     var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
+    var fileName = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0") + ".zip";
 
     getBgImage(function (bgImage) {
         function buildAndDownload(bgBytes) {
@@ -313,7 +311,7 @@ function exportUserTheme() {
             var url = URL.createObjectURL(blob);
             var a = document.createElement("a");
             a.href = url;
-            a.download = safeFileName;
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
