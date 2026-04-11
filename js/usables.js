@@ -33,6 +33,7 @@ var STORAGE_KEYS = {
     FAVICON: "ch_favicon",
     THEME: "ch_theme",
     THEMES_ENABLED: "ch_themes_enabled",
+    CUSTOM_THEMES_ENABLED: "ch_custom_themes_enabled",
     SEARCH_URL: "ch_search_url",
 };
 

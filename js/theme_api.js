@@ -3,6 +3,8 @@
 // --- DOM Elements ---
 var browseThemesBtn = document.getElementById("browse-themes-btn");
 var themesEnabledToggle = document.getElementById("themes-enabled-toggle");
+var customThemesEnabledToggle = document.getElementById("custom-themes-toggle");
+var customThemesSetting = document.getElementById("custom-themes-setting");
 var themesOverlay = document.getElementById("themes-overlay");
 var themesGrid = document.getElementById("themes-grid");
 var themesStatus = document.getElementById("themes-status");
@@ -185,7 +187,7 @@ function renderThemeGrid(themes) {
     appendSection("Community", communityItems);
 }
 
-function loadThemesRegistry() {
+function loadThemesRegistry(onComplete) {
     themesStatus.textContent = "";
     fetch("themes/themes.json")
         .then(function(r) {
@@ -195,19 +197,26 @@ function loadThemesRegistry() {
         .then(function(data) {
             if (!Array.isArray(data) || data.length === 0) {
                 themesStatus.textContent = "No themes found in registry.";
+                if (onComplete) onComplete();
                 return;
             }
             renderThemeGrid(data);
+            if (onComplete) onComplete();
         })
         .catch(function() {
             themesStatus.textContent = "Could not load themes.";
+            if (onComplete) onComplete();
         });
 }
 
 function openThemesOverlay() {
     themesOverlay.classList.remove("hidden");
     themesOverlay.setAttribute("aria-hidden", "false");
-    loadThemesRegistry();
+    if (localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true") {
+        loadThemesRegistry(loadCommunityThemes);
+    } else {
+        loadThemesRegistry();
+    }
 }
 
 function closeThemesOverlay() {
@@ -215,10 +224,97 @@ function closeThemesOverlay() {
     themesOverlay.setAttribute("aria-hidden", "true");
 }
 
+function loadCommunityThemes() {
+    var manifest = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest)
+        ? chrome.runtime.getManifest() : {};
+    var war = manifest.web_accessible_resources || [];
+    var themeIdSet = new Set();
+    war.forEach(function(entry) {
+        var resources = Array.isArray(entry.resources) ? entry.resources : [];
+        resources.forEach(function(r) {
+            var m = /^themes\/(chu-[a-zA-Z0-9_-]+)\//.exec(r);
+            if (m) themeIdSet.add(m[1]);
+        });
+    });
+
+    var themeIds = Array.from(themeIdSet);
+    if (themeIds.length === 0) return;
+
+    var pending = themeIds.length;
+    var communityThemes = [];
+    themeIds.forEach(function(id) {
+        fetch("themes/" + id + "/theme.json")
+            .then(function(r) {
+                if (!r.ok) throw new Error("Not found");
+                return r.json();
+            })
+            .then(function(data) {
+                var name = (typeof data.name === "string" && data.name.trim())
+                    ? data.name.trim()
+                    : id.replace(/^chu-/, "");
+                communityThemes.push({ id: id, name: name });
+            })
+            .catch(function() {
+                communityThemes.push({ id: id, name: id.replace(/^chu-/, "") });
+            })
+            .finally(function() {
+                pending--;
+                if (pending === 0) appendCommunityThemes(communityThemes);
+            });
+    });
+}
+
+function appendCommunityThemes(items) {
+    if (!items.length) return;
+
+    var storedId = localStorage.getItem(STORAGE_KEYS.THEME);
+    var activeId;
+    if (storedId === null) activeId = 0;
+    else if (storedId === "user") activeId = null;
+    else if (/^chu-/.test(storedId)) activeId = storedId;
+    else activeId = Number(storedId);
+
+    // Find an existing Community section label (added by renderThemeGrid or a prior call)
+    var communityLabel = null;
+    var labels = themesGrid.querySelectorAll(".themes-section-label");
+    labels.forEach(function(label) {
+        if (label.textContent === "Community") communityLabel = label;
+    });
+
+    // Collect theme IDs already rendered in the Community section to avoid duplicates
+    var existingIds = new Set();
+    if (communityLabel) {
+        var sibling = communityLabel.nextElementSibling;
+        while (sibling && !sibling.classList.contains("themes-section-label")) {
+            if (sibling.dataset.themeId) existingIds.add(sibling.dataset.themeId);
+            sibling = sibling.nextElementSibling;
+        }
+    }
+
+    var newItems = items.filter(function(item) { return !existingIds.has(item.id); });
+    if (!newItems.length) return;
+
+    if (!communityLabel) {
+        communityLabel = document.createElement("p");
+        communityLabel.className = "themes-section-label";
+        communityLabel.textContent = "Community";
+        themesGrid.appendChild(communityLabel);
+    }
+
+    newItems.forEach(function(item) {
+        var isActive = activeId === null ? false :
+                       typeof activeId === "number" ? Number(item.id) === activeId :
+                       item.id === activeId;
+        themesGrid.appendChild(createThemeCard(item.id, item.name, isActive));
+    });
+}
+
 function applyThemesEnabledSetting() {
     var enabled = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED) === "true";
     themesEnabledToggle.checked = enabled;
     browseThemesBtn.classList.toggle("hidden", !enabled);
+    customThemesSetting.classList.toggle("hidden", !enabled);
+    customThemesEnabledToggle.checked = enabled && localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true";
 }
 
 // --- Event Listeners ---
@@ -229,7 +325,15 @@ document.getElementById("close-themes-btn").addEventListener("click", closeTheme
 themesEnabledToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.THEMES_ENABLED, this.checked ? "true" : "false");
     browseThemesBtn.classList.toggle("hidden", !this.checked);
-    if (!this.checked) closeThemesOverlay();
+    customThemesSetting.classList.toggle("hidden", !this.checked);
+    if (!this.checked) {
+        closeThemesOverlay();
+        customThemesEnabledToggle.checked = false;
+    }
+});
+
+customThemesEnabledToggle.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED, this.checked ? "true" : "false");
 });
 
 // --- Initialization ---
