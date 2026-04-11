@@ -275,8 +275,8 @@ function dataUrlToBytes(dataUrl) {
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
-    exportThemeBtn.classList.toggle("hidden", !isUser);
+    var themeId = localStorage.getItem(STORAGE_KEYS.THEME);
+    exportThemeBtn.classList.toggle("hidden", themeId === null);
 }
 
 function markUserTheme() {
@@ -285,6 +285,8 @@ function markUserTheme() {
 }
 
 function exportUserTheme() {
+    var themeId = localStorage.getItem(STORAGE_KEYS.THEME) || "user";
+    var safeFileName = themeId.replace(/[^a-zA-Z0-9_\-]/g, "_") + ".zip";
     var theme = {
         name: "User Theme",
         bgColor: localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR,
@@ -311,7 +313,7 @@ function exportUserTheme() {
             var url = URL.createObjectURL(blob);
             var a = document.createElement("a");
             a.href = url;
-            a.download = "user-theme.zip";
+            a.download = safeFileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
