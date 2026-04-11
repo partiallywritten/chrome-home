@@ -24,21 +24,22 @@ theme_api.js → theme browser overlay and theme preset application
 
 ```
 themes/
-  README.md          ← This file (theming API reference)
-  themes.json        ← Registry of all available themes
+  README.md              ← This file (theming API reference)
+  included_themes.json   ← Registry of bundled (numeric-id) themes
+  community_themes.json  ← Registry of community (chu- prefix) themes
   0/
-    theme.json       ← Default theme settings (id 0)
-    background.jpg   ← Default theme background image
+    theme.json           ← Default theme settings (id 0)
+    background.jpg       ← Default theme background image
   1/
     theme.json
     background.jpg
   chu-forest/
-    theme.json       ← Community theme (id "chu-forest")
+    theme.json           ← Community theme (id "chu-forest")
     background.jpg
   ...
 ```
 
-Themes are identified by their `id` in `themes.json`. The id determines both the folder name and which section of the theme browser the theme appears in. See **Id Syntax** below.
+Themes are identified by their `id`. The id determines both the folder name and which section of the theme browser the theme appears in. See **Id Syntax** below.
 
 ---
 
@@ -62,12 +63,12 @@ The extension tracks the active configuration state via the `ch_theme` key in `l
 
 ## Id Syntax
 
-The `id` field in `themes.json` determines both the folder name and which section the theme appears in within the theme browser.
+The `id` field determines both the folder name and which section the theme appears in within the theme browser.
 
-| Id type | Example | Section | Folder |
-|---------|---------|---------|--------|
-| Non-negative integer | `0`, `1`, `2` | **Included** | `themes/0/`, `themes/1/`, … |
-| String prefixed `chu-` | `"chu-forest"` | **Community** | `themes/chu-forest/` |
+| Id type | Example | Registry file | Section | Folder |
+|---------|---------|---------------|---------|--------|
+| Non-negative integer | `0`, `1`, `2` | `included_themes.json` | **Included** | `themes/0/`, `themes/1/`, … |
+| String prefixed `chu-` | `"chu-forest"` | `community_themes.json` | **Community** | `themes/chu-forest/` |
 
 - **Included** themes (numeric ids) are reserved for themes bundled with the extension.  
   Theme `0` is always the built-in default applied on first launch.
@@ -83,53 +84,43 @@ The `id` field in `themes.json` determines both the folder name and which sectio
 1. Create a new numbered folder (e.g. `themes/2/`).
 2. Add a `background.jpg` — the background image for the theme.
 3. Add a `theme.json` — see schema below.
-4. Register the theme in `themes/themes.json` by appending `{ "id": 2, "name": "My Theme" }`.
+4. Register the theme in `themes/included_themes.json` by appending `{ "id": 2, "name": "My Theme" }`.
 
 ### Adding a Community theme (chu- id)
-
-There are two ways to make a community theme appear in the theme browser.
-
-#### Option A — Register in `themes.json` (manual)
 
 1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
 2. Create the folder `themes/chu-dark-ocean/`.
 3. Add a `background.jpg` and a `theme.json`.
-4. Register the theme in `themes/themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
+4. Register the theme in `themes/community_themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
+5. Enable the **Enable Community Themes** toggle inside the theme browser. The theme will appear in the **Community** section.
 
-#### Option B — Auto-discovery via Custom Themes toggle (recommended for user-added themes)
+### `themes/included_themes.json` — Included Registry
 
-When the **Enable Custom Themes** toggle is turned on in the Theme settings panel, the extension automatically discovers any `chu-` prefixed theme folders declared in `web_accessible_resources` inside `manifest.json`. No entry in `themes/themes.json` is needed — that file remains exclusive to **Included** themes.
-
-1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
-2. Create the folder `themes/chu-dark-ocean/`.
-3. Add a `background.jpg` and a `theme.json` (the `name` field is used as the display name).
-4. Declare the folder in `manifest.json` under `web_accessible_resources`:
-   ```json
-   {
-     "web_accessible_resources": [
-       {
-         "resources": ["themes/chu-dark-ocean/*"],
-         "matches": ["<all_urls>"]
-       }
-     ]
-   }
-   ```
-5. Enable the **Enable Custom Themes** toggle in the Theme settings panel. The community theme will appear lazily in the **Community** section when the theme browser is opened.
-### `themes/themes.json` — Registry
-
-An array of theme descriptor objects:
+An array of included theme descriptor objects (numeric ids only):
 
 ```json
 [
   { "id": 0, "name": "Default" },
-  { "id": 1, "name": "My Theme" },
-  { "id": "chu-forest", "name": "Forest" }
+  { "id": 1, "name": "My Theme" }
 ]
 ```
 
+### `themes/community_themes.json` — Community Registry
+
+An array of community theme descriptor objects (`chu-` ids only):
+
+```json
+[
+  { "id": "chu-forest", "name": "Forest" },
+  { "id": "chu-dark-ocean", "name": "Dark Ocean" }
+]
+```
+
+### Registry field reference (both files)
+
 | Field  | Type             | Required | Description                                                                 |
 |--------|------------------|----------|-----------------------------------------------------------------------------|
-| `id`   | number or string | yes      | Unique theme id. A non-negative integer for **Included** themes; a string starting with `"chu-"` (followed by `[a-zA-Z0-9_-]+`) for **Community** themes. Must match the folder name exactly. |
+| `id`   | number or string | yes      | Unique theme id. A non-negative integer for `included_themes.json`; a string starting with `"chu-"` (followed by `[a-zA-Z0-9_-]+`) for `community_themes.json`. Must match the folder name exactly. |
 | `name` | string           | yes      | Display name shown in the theme browser |
 
 ---
