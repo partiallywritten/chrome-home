@@ -126,6 +126,7 @@ function clearErrorOnInput(inputEl, errorEl) {
 
 function getBgImageCapDimensions() {
     var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    if (cap === "default") return null;
     if (cap === "4K") return { width: 3840, height: 2160 };
     if (cap === "1440p") return { width: 2560, height: 1440 };
     return { width: 1920, height: 1080 };
@@ -135,7 +136,13 @@ function applyLocalBackgroundFile(file) {
     readImageFile(file, bgImageError, function(dataUrl) {
         bgImageInput.value = "";
         bgImageInput.removeAttribute("aria-invalid");
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         var dims = getBgImageCapDimensions();
+        if (!dims) {
+            setBodyBgImage(dataUrl);
+            saveBgImage(dataUrl);
+            return;
+        }
         compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
             setBodyBgImage(compressed);
             saveBgImage(compressed);
@@ -148,6 +155,7 @@ function applyLocalFaviconFile(file) {
         faviconUrlInput.value = "";
         faviconUrlInput.removeAttribute("aria-invalid");
         localStorage.setItem(STORAGE_KEYS.FAVICON, dataUrl);
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         setFavicon(dataUrl);
     });
 }
@@ -157,6 +165,7 @@ function applyLocalFaviconFile(file) {
 function openSettings() {
     settingsPanel.classList.add("open");
     settingsPanel.setAttribute("aria-hidden", "false");
+    applyThemesEnabledSetting();
 }
 
 function closeSettingsPanel() {
@@ -199,6 +208,7 @@ function restoreAllDefaults() {
         }
     });
     saveBgImage("");
+    closeThemesOverlay();
     applyThemeSettings();
     applyBackground();
     applyBackgroundBrightness();
@@ -206,6 +216,8 @@ function restoreAllDefaults() {
     applyClockSettings();
     applyFontSettings();
     applyGeneralSettings();
+    applyThemesEnabledSetting();
+    renderThemeActiveState(0);
 }
 
 // --- Event Listeners ---
@@ -222,8 +234,12 @@ modalOverlay.addEventListener("click", function(e) {
 
 document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
-        closeSettingsPanel();
-        closeModal();
+        if (!themesOverlay.classList.contains("hidden")) {
+            closeThemesOverlay();
+        } else {
+            closeSettingsPanel();
+            closeModal();
+        }
     }
 });
 
@@ -243,18 +259,21 @@ settingsSections.forEach(function(section) {
 // Color Inputs
 bgColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_COLOR, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--bg-color", this.value);
     document.body.style.backgroundColor = this.value;
 });
 
 highlightColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.HIGHLIGHT_COLOR, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--accent", this.value);
     docStyle.setProperty("--accent-hover", hexToRgba(this.value, 0.85));
 });
 
 textColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.TEXT_COLOR, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--text", this.value);
     docStyle.setProperty("--text-muted", hexToRgba(this.value, 0.74));
 });
@@ -262,30 +281,36 @@ textColorInput.addEventListener("input", function() {
 // Clock Inputs
 clockSizeInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_SIZE, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--clock-size", `${this.value}rem`);
 });
 clockXInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--clock-x", `${this.value}px`);
 });
 clockYInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--clock-y", `${this.value}px`);
 });
 
 // Background Controls
 bgImageToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_ENABLED, this.checked ? "true" : "false");
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     applyBackground();
 });
 
 bgBrightnessInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.BG_BRIGHTNESS, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     docStyle.setProperty("--bg-image-brightness", String(brightnessScale(this.value)));
 });
 
 bgImageCapSelect.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_CAP, this.value);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
 });
 
 bgFileInput.addEventListener("change", function() {
@@ -299,12 +324,14 @@ applyBgBtn.addEventListener("click", function() {
         return;
     }
     processUrlInput(bgImageInput, bgImageError, "Please enter a valid http or https image URL.", function(safeUrl) {
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         saveBgImage(safeUrl);
         setBodyBgImage(safeUrl);
     });
 });
 
 clearBgBtn.addEventListener("click", function() {
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     saveBgImage("");
     bgImageInput.value = "";
     bgFileInput.value = "";
@@ -322,6 +349,7 @@ applyFontBtn.addEventListener("click", function() {
     if (!rawUrl) {
         localStorage.removeItem(STORAGE_KEYS.FONT_URL);
         localStorage.setItem(STORAGE_KEYS.FONT_FAMILY, fontFamily);
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         applyCustomFont("", fontFamily);
         return;
     }
@@ -329,6 +357,7 @@ applyFontBtn.addEventListener("click", function() {
     processUrlInput(fontUrlInput, fontUrlError, "Please enter a valid http or https stylesheet URL.", function(safeUrl) {
         localStorage.setItem(STORAGE_KEYS.FONT_URL, safeUrl);
         localStorage.setItem(STORAGE_KEYS.FONT_FAMILY, fontFamily);
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         applyCustomFont(safeUrl, fontFamily);
     });
 });
@@ -338,6 +367,7 @@ applyTabNameBtn.addEventListener("click", function() {
     var name = tabNameInput.value.trim();
     if (name) localStorage.setItem(STORAGE_KEYS.TAB_NAME, name);
     else localStorage.removeItem(STORAGE_KEYS.TAB_NAME);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     document.title = name || "New Tab";
 });
 
@@ -353,12 +383,14 @@ applyFaviconBtn.addEventListener("click", function() {
     }
     processUrlInput(faviconUrlInput, faviconUrlError, "Please enter a valid http or https image URL.", function(safeUrl) {
         localStorage.setItem(STORAGE_KEYS.FAVICON, safeUrl);
+        localStorage.setItem(STORAGE_KEYS.THEME, "user");
         setFavicon(safeUrl);
     });
 });
 
 clearFaviconBtn.addEventListener("click", function() {
     localStorage.removeItem(STORAGE_KEYS.FAVICON);
+    localStorage.setItem(STORAGE_KEYS.THEME, "user");
     faviconUrlInput.value = "";
     faviconFileInput.value = "";
     faviconUrlInput.removeAttribute("aria-invalid");

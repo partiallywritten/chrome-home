@@ -30,6 +30,8 @@ var STORAGE_KEYS = {
     FONT_FAMILY: "ch_font_family",
     TAB_NAME: "ch_tab_name",
     FAVICON: "ch_favicon",
+    THEME: "ch_theme",
+    THEMES_ENABLED: "ch_themes_enabled",
 };
 
 // --- Cached DOM References ---
@@ -66,8 +68,6 @@ function sanitizeHttpUrl(raw) {
 }
 
 // --- Background Helpers ---
-
-var DEFAULT_BG_IMAGE = "img/default.jpg";
 
 function getBgImage(callback) {
     chrome.storage.local.get([STORAGE_KEYS.BG_IMAGE], function(result) {

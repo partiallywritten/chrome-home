@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>New Tab</title>
     <link rel="stylesheet" href="css/style.min.css" />
-    <link rel="preload" href="img/default.jpg" as="image" />
   </head>
   <body>
     <div id="background-layer" class="background-layer" aria-hidden="true"></div>
@@ -137,6 +136,7 @@
             <div class="setting-group">
               <label for="bg-image-cap">Image Quality Cap</label>
               <select id="bg-image-cap" class="text-input">
+                <option value="default">Default (no scaling)</option>
                 <option value="1080p">1080p (1920×1080)</option>
                 <option value="1440p">1440p (2560×1440)</option>
                 <option value="4K">4K (3840×2160)</option>
@@ -148,6 +148,15 @@
         <details class="settings-section">
           <summary>Theme</summary>
           <div class="settings-section-content">
+            <div class="setting-group">
+              <div class="toggle-row">
+                <span class="setting-group-label">Enable Theme Browser</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="themes-enabled-toggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
             <div class="setting-group">
               <label for="bg-color">Background Color</label>
               <input type="color" id="bg-color" class="color-picker" value="#003056" />
@@ -209,9 +218,22 @@
         </details>
       </div>
       <div class="settings-footer">
+        <button id="browse-themes-btn" class="btn btn-ghost browse-themes-btn hidden">Browse Themes</button>
         <button id="restore-defaults" class="btn btn-restore">Restore Defaults</button>
       </div>
     </aside>
+
+    <!-- Themes overlay (inside settings panel visually, separate node for z-index) -->
+    <div id="themes-overlay" class="themes-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="themes-overlay-title" aria-hidden="true">
+      <div class="themes-overlay__header">
+        <h3 id="themes-overlay-title">Browse Themes</h3>
+        <button id="close-themes-btn" class="icon-btn" title="Close" aria-label="Close theme browser">&times;</button>
+      </div>
+      <div class="themes-overlay__body">
+        <p id="themes-status" class="themes-status"></p>
+        <div id="themes-grid" class="themes-grid"></div>
+      </div>
+    </div>
 
     <!-- Add / Edit favorite modal -->
     <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -237,5 +259,6 @@
     <script src="js/usables.js"></script>
     <script src="js/defaults.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/theme_api.js"></script>
   </body>
 </html>
