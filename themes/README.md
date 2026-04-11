@@ -27,16 +27,19 @@ themes/
   README.md              ← This file (theming API reference)
   included_themes.json   ← Registry of bundled (numeric-id) themes
   community_themes.json  ← Registry of community (chu- prefix) themes
-  0/
-    theme.json           ← Default theme settings (id 0)
-    background.jpg       ← Default theme background image
-  1/
-    theme.json
-    background.jpg
-  chu-forest/
-    theme.json           ← Community theme (id "chu-forest")
-    background.jpg
-  ...
+  included/
+    0/
+      theme.json         ← Default theme settings (id 0)
+      background.jpg     ← Default theme background image
+    1/
+      theme.json
+      background.jpg
+    ...
+  community/
+    chu-forest/
+      theme.json         ← Community theme (id "chu-forest")
+      background.jpg
+    ...
 ```
 
 Themes are identified by their `id`. The id determines both the folder name and which section of the theme browser the theme appears in. See **Id Syntax** below.
@@ -67,8 +70,8 @@ The `id` field determines both the folder name and which section the theme appea
 
 | Id type | Example | Registry file | Section | Folder |
 |---------|---------|---------------|---------|--------|
-| Non-negative integer | `0`, `1`, `2` | `included_themes.json` | **Included** | `themes/0/`, `themes/1/`, … |
-| String prefixed `chu-` | `"chu-forest"` | `community_themes.json` | **Community** | `themes/chu-forest/` |
+| Non-negative integer | `0`, `1`, `2` | `included_themes.json` | **Included** | `themes/included/0/`, `themes/included/1/`, … |
+| String prefixed `chu-` | `"chu-forest"` | `community_themes.json` | **Community** | `themes/community/chu-forest/` |
 
 - **Included** themes (numeric ids) are reserved for themes bundled with the extension.  
   Theme `0` is always the built-in default applied on first launch.
@@ -81,15 +84,15 @@ The `id` field determines both the folder name and which section the theme appea
 
 ### Adding an Included theme (numeric id)
 
-1. Create a new numbered folder (e.g. `themes/2/`).
+1. Create a new numbered folder (e.g. `themes/included/6/`).
 2. Add a `background.jpg` — the background image for the theme.
 3. Add a `theme.json` — see schema below.
-4. Register the theme in `themes/included_themes.json` by appending `{ "id": 2, "name": "My Theme" }`.
+4. Register the theme in `themes/included_themes.json` by appending `{ "id": 6, "name": "My Theme" }`.
 
 ### Adding a Community theme (chu- id)
 
 1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
-2. Create the folder `themes/chu-dark-ocean/`.
+2. Create the folder `themes/community/chu-dark-ocean/`.
 3. Add a `background.jpg` and a `theme.json`.
 4. Register the theme in `themes/community_themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
 5. Enable the **Enable Community Themes** toggle inside the theme browser. The theme will appear in the **Community** section.
