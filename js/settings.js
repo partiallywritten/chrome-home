@@ -8,6 +8,7 @@ var closeSettingsBtn = document.getElementById("close-settings");
 var settingsSections = settingsPanel.querySelectorAll("details.settings-section");
 
 var bgColorInput = document.getElementById("bg-color");
+var surfaceColorInput = document.getElementById("surface-color");
 var highlightColorInput = document.getElementById("highlight-color");
 var textColorInput = document.getElementById("text-color");
 
@@ -23,6 +24,10 @@ var bgImageToggle = document.getElementById("bg-image-toggle");
 var clockSizeInput = document.getElementById("clock-size");
 var clockXInput = document.getElementById("clock-x");
 var clockYInput = document.getElementById("clock-y");
+
+var searchWidthInput = document.getElementById("search-width");
+var searchXInput = document.getElementById("search-x");
+var searchYInput = document.getElementById("search-y");
 
 var fontUrlInput = document.getElementById("font-url");
 var fontUrlError = document.getElementById("font-url-error");
@@ -287,6 +292,7 @@ function exportUserTheme() {
     var theme = {
         name: "User Theme",
         bgColor: localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR,
+        surfaceColor: localStorage.getItem(STORAGE_KEYS.SURFACE_COLOR) || DEFAULTS.SURFACE_COLOR,
         highlightColor: localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR,
         textColor: localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR,
         clockSize: localStorage.getItem(STORAGE_KEYS.CLOCK_SIZE) || DEFAULTS.CLOCK_SIZE,
@@ -446,11 +452,19 @@ bgColorInput.addEventListener("input", function() {
     document.body.style.backgroundColor = this.value;
 });
 
+surfaceColorInput.addEventListener("input", function() {
+    localStorage.setItem(STORAGE_KEYS.SURFACE_COLOR, this.value);
+    markUserTheme();
+    docStyle.setProperty("--surface", hexToRgba(this.value, 0.52));
+    docStyle.setProperty("--panel-bg", hexToRgba(this.value, 0.95));
+});
+
 highlightColorInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.HIGHLIGHT_COLOR, this.value);
     markUserTheme();
     docStyle.setProperty("--accent", this.value);
     docStyle.setProperty("--accent-hover", hexToRgba(this.value, 0.85));
+    docStyle.setProperty("--surface-hover", hexToRgba(this.value, 0.16));
 });
 
 textColorInput.addEventListener("input", function() {
@@ -475,6 +489,20 @@ clockYInput.addEventListener("input", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
     markUserTheme();
     docStyle.setProperty("--clock-y", `${this.value}px`);
+});
+
+// Search Bar Controls
+searchWidthInput.addEventListener("input", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_WIDTH, this.value);
+    docStyle.setProperty("--search-width", `${this.value}px`);
+});
+searchXInput.addEventListener("input", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_X, this.value);
+    docStyle.setProperty("--search-x", `${this.value}px`);
+});
+searchYInput.addEventListener("input", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_Y, this.value);
+    docStyle.setProperty("--search-y", `${this.value}px`);
 });
 
 // Background Controls

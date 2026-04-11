@@ -3,11 +3,15 @@
 // --- Configuration & Constants ---
 var DEFAULTS = {
     BG_COLOR: "#003056",
+    SURFACE_COLOR: "#003056",
     HIGHLIGHT_COLOR: "#be9da8",
     TEXT_COLOR: "#eeb8b7",
     CLOCK_SIZE: "8",
     CLOCK_X: "0",
     CLOCK_Y: "0",
+    SEARCH_WIDTH: "560",
+    SEARCH_X: "0",
+    SEARCH_Y: "0",
     FONT_FAMILY: "\"JetBrains Mono\", \"Fira Code\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
     TAB_NAME: "",
     FAVICON: "",
@@ -18,6 +22,7 @@ var DEFAULTS = {
 var STORAGE_KEYS = {
     FAVORITES: "ch_favorites",
     BG_COLOR: "ch_bg_color",
+    SURFACE_COLOR: "ch_surface_color",
     BG_IMAGE: "ch_bg_image",
     BG_IMAGE_ENABLED: "ch_bg_image_enabled",
     BG_BRIGHTNESS: "ch_bg_brightness",
@@ -27,6 +32,9 @@ var STORAGE_KEYS = {
     CLOCK_SIZE: "ch_clock_size",
     CLOCK_X: "ch_clock_x",
     CLOCK_Y: "ch_clock_y",
+    SEARCH_WIDTH: "ch_search_width",
+    SEARCH_X: "ch_search_x",
+    SEARCH_Y: "ch_search_y",
     FONT_URL: "ch_font_url",
     FONT_FAMILY: "ch_font_family",
     TAB_NAME: "ch_tab_name",
@@ -142,16 +150,21 @@ function setFavicon(href) {
 
 function applyThemeSettings() {
     var bgColor = localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR;
+    var surfaceColor = localStorage.getItem(STORAGE_KEYS.SURFACE_COLOR) || DEFAULTS.SURFACE_COLOR;
     var highlightColor = localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR;
     var textColor = localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR;
 
     docStyle.setProperty("--bg-color", bgColor);
+    docStyle.setProperty("--surface", hexToRgba(surfaceColor, 0.52));
+    docStyle.setProperty("--surface-hover", hexToRgba(highlightColor, 0.16));
+    docStyle.setProperty("--panel-bg", hexToRgba(surfaceColor, 0.95));
     docStyle.setProperty("--accent", highlightColor);
     docStyle.setProperty("--accent-hover", hexToRgba(highlightColor, 0.85));
     docStyle.setProperty("--text", textColor);
     docStyle.setProperty("--text-muted", hexToRgba(textColor, 0.74));
 
     document.getElementById("bg-color").value = bgColor;
+    document.getElementById("surface-color").value = surfaceColor;
     document.getElementById("highlight-color").value = highlightColor;
     document.getElementById("text-color").value = textColor;
     document.body.style.backgroundColor = bgColor;
@@ -221,6 +234,19 @@ function applyClockSettings() {
     docStyle.setProperty("--clock-size", `${clockSize}rem`);
     docStyle.setProperty("--clock-x", `${clockX}px`);
     docStyle.setProperty("--clock-y", `${clockY}px`);
+}
+
+function applySearchBarSettings() {
+    var searchWidth = localStorage.getItem(STORAGE_KEYS.SEARCH_WIDTH) || DEFAULTS.SEARCH_WIDTH;
+    var searchX = localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X;
+    var searchY = localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y;
+
+    document.getElementById("search-width").value = searchWidth;
+    document.getElementById("search-x").value = searchX;
+    document.getElementById("search-y").value = searchY;
+    docStyle.setProperty("--search-width", `${searchWidth}px`);
+    docStyle.setProperty("--search-x", `${searchX}px`);
+    docStyle.setProperty("--search-y", `${searchY}px`);
 }
 
 function applyFontSettings() {

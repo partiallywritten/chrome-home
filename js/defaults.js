@@ -27,6 +27,7 @@ applyBackground();
 applyBackgroundBrightness();
 applyBgImageCapSetting();
 applyClockSettings();
+applySearchBarSettings();
 applyFontSettings();
 applyGeneralSettings();
 applySearchSettings();

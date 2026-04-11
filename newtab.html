@@ -89,23 +89,6 @@
             </div>
             <div class="setting-group">
               <div class="label-row">
-                <label for="search-url">Search URL</label>
-                <button id="clear-search-url" class="btn-inline-reset">reset</button>
-              </div>
-              <div class="input-row">
-                <input
-                  type="text"
-                  id="search-url"
-                  class="text-input"
-                  placeholder="https://www.google.com/search?q={query}"
-                  aria-describedby="search-url-error"
-                />
-                <button id="apply-search-url" class="btn">Apply</button>
-              </div>
-              <span id="search-url-error" class="field-error" aria-live="polite"></span>
-            </div>
-            <div class="setting-group">
-              <div class="label-row">
                 <label for="favicon-url">Favicon URL</label>
                 <button id="clear-favicon" class="btn-inline-reset">reset</button>
               </div>
@@ -123,6 +106,41 @@
                 <input type="file" id="favicon-file" class="text-input file-input" accept="image/*" />
               </div>
               <span id="favicon-url-error" class="field-error" aria-live="polite"></span>
+            </div>
+          </div>
+        </details>
+
+        <details class="settings-section">
+          <summary>Search</summary>
+          <div class="settings-section-content">
+            <div class="setting-group">
+              <div class="label-row">
+                <label for="search-url">Search URL</label>
+                <button id="clear-search-url" class="btn-inline-reset">reset</button>
+              </div>
+              <div class="input-row">
+                <input
+                  type="text"
+                  id="search-url"
+                  class="text-input"
+                  placeholder="https://www.google.com/search?q={query}"
+                  aria-describedby="search-url-error"
+                />
+                <button id="apply-search-url" class="btn">Apply</button>
+              </div>
+              <span id="search-url-error" class="field-error" aria-live="polite"></span>
+            </div>
+            <div class="setting-group">
+              <label for="search-width">Search Bar Width (px)</label>
+              <input type="range" id="search-width" min="100" max="900" step="10" value="560" />
+            </div>
+            <div class="setting-group">
+              <label for="search-x">Search Bar Position X</label>
+              <input type="range" id="search-x" min="-300" max="300" step="5" value="0" />
+            </div>
+            <div class="setting-group">
+              <label for="search-y">Search Bar Position Y</label>
+              <input type="range" id="search-y" min="-300" max="300" step="5" value="0" />
             </div>
           </div>
         </details>
@@ -190,6 +208,10 @@
             <div class="setting-group">
               <label for="bg-color">Background Color</label>
               <input type="color" id="bg-color" class="color-picker" value="#003056" />
+            </div>
+            <div class="setting-group">
+              <label for="surface-color">Element Background Color</label>
+              <input type="color" id="surface-color" class="color-picker" value="#003056" />
             </div>
             <div class="setting-group">
               <label for="highlight-color">Highlight Color</label>

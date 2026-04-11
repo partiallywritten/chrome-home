@@ -34,6 +34,7 @@ function applyThemePreset(theme, themeId) {
     };
 
     set(STORAGE_KEYS.BG_COLOR, theme.bgColor);
+    set(STORAGE_KEYS.SURFACE_COLOR, theme.surfaceColor);
     set(STORAGE_KEYS.HIGHLIGHT_COLOR, theme.highlightColor);
     set(STORAGE_KEYS.TEXT_COLOR, theme.textColor);
     set(STORAGE_KEYS.CLOCK_SIZE, theme.clockSize);
