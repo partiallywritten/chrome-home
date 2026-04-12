@@ -5,6 +5,13 @@
 </div>
 
 
+## Install
+- Click to download the extension: <a href="https://github.com/partiallywritten/Nozy-NT/archive/refs/heads/main.zip"><img src="assets/nozy-dl.svg" alt="nozy icon" style="height: 2em; vertical-align: -0.125em;"></a>
+- Unzip it.
+- Head to `chrome://extensions` and enable developer mode.
+- Click load unpacked and select the unzipped folder.
+
+
 ## Customizations
 Best way to explore the customizations is by downloading the extension and heading to the settings panel by clicking the settings icon at the bottom right corner. However if you are more of a text person below are the list of things that can be customized.
 
@@ -44,12 +51,6 @@ To install community themes:
  - Enable custom themes inside the "Browse Themes" panel.
 
 See more info [here](/themes/README.md).
-
-
-## Install
-- Download the [source code](https://github.com/partiallywritten/Nozy-NT/archive/refs/heads/main.zip) and unzip it.
-- Head to `chrome://extensions` and enable developer mode.
-- Click load unpacked and select the unzipped folder.
 
 
 ## Warning
