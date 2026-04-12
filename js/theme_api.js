@@ -11,14 +11,14 @@ var themesStatus = document.getElementById("themes-status");
 // --- Themes ---
 
 function getThemeFolder(idStr) {
-    return /^chu-/.test(idStr) ? "themes/community/" + idStr : "themes/included/" + idStr;
+    return /^nnt-/.test(idStr) ? "themes/community/" + idStr : "themes/included/" + idStr;
 }
 
 function getActiveThemeId() {
     var storedId = localStorage.getItem(STORAGE_KEYS.THEME);
     if (storedId === null) return 0;
     if (storedId === "user") return null;
-    if (/^chu-/.test(storedId)) return storedId;
+    if (/^nnt-/.test(storedId)) return storedId;
     return Number(storedId);
 }
 
@@ -149,7 +149,7 @@ function createThemeCard(idStr, name, isActive) {
                 return r.json();
             })
             .then(function (themeData) {
-                var themeIdVal = /^chu-/.test(idStr) ? idStr : Number(idStr);
+                var themeIdVal = /^nnt-/.test(idStr) ? idStr : Number(idStr);
                 applyThemePreset(themeData, themeIdVal);
             })
             .catch(function () {
@@ -235,10 +235,10 @@ function loadCommunityThemes() {
             var items = [];
             data.forEach(function(t) {
                 var id = t.id;
-                if (typeof id === "string" && /^chu-[a-zA-Z0-9_-]+$/.test(id)) {
+                if (typeof id === "string" && /^nnt-[a-zA-Z0-9_-]+$/.test(id)) {
                     var name = (typeof t.name === "string" && t.name.trim())
                         ? t.name.trim()
-                        : id.replace(/^chu-/, "");
+                        : id.replace(/^nnt-/, "");
                     items.push({ id: id, name: name });
                 }
             });

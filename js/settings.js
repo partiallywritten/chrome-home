@@ -64,7 +64,7 @@ var settingsBranding = document.getElementById("settings-branding");
 
 // --- Branding ---
 const version = chrome.runtime.getManifest().version ?? "unknown";
-settingsBranding.textContent = "NozyNT (v" + version + ")";
+settingsBranding.textContent = "Nozy-NT (v" + version + ")";
 
 var searchForm = document.getElementById("search-form");
 var searchInput = document.getElementById("search-input");
@@ -319,7 +319,7 @@ function exportUserTheme() {
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
     var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
-    var themeId = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0");
+    var themeId = "nnt-" + crc32(jsonBytes).toString(16).padStart(8, "0");
     var fileName = themeId + ".zip";
 
     getBgImage(function (bgImage) {
