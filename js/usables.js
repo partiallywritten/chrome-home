@@ -260,8 +260,8 @@ function applyClockVisibility() {
 
 function applySearchBarSettings() {
     var searchWidth = localStorage.getItem(STORAGE_KEYS.SEARCH_WIDTH) || DEFAULTS.SEARCH_WIDTH;
-    var searchX = localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X;
-    var searchY = localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y;
+    var searchX = Math.max(-150, Math.min(150, Number(localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X)));
+    var searchY = Math.max(-150, Math.min(150, Number(localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y)));
 
     document.getElementById("search-width").value = searchWidth;
     document.getElementById("search-x").value = searchX;
