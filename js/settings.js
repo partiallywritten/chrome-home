@@ -395,7 +395,7 @@ function resetConfirmState() {
 }
 
 function restoreAllDefaults() {
-    fetch("themes/0/theme.json")
+    fetch("themes/included/0/theme.json")
         .then(function(r) {
             if (!r.ok) throw new Error("Not found");
             return r.json();

@@ -10,6 +10,10 @@ var themesStatus = document.getElementById("themes-status");
 
 // --- Themes ---
 
+function getThemeFolder(idStr) {
+    return /^chu-/.test(idStr) ? "themes/community/" + idStr : "themes/included/" + idStr;
+}
+
 function getActiveThemeId() {
     var storedId = localStorage.getItem(STORAGE_KEYS.THEME);
     if (storedId === null) return 0;
@@ -68,7 +72,7 @@ function applyThemePreset(theme, themeId) {
     if (!bgEnabled) {
         saveBgImage("", function() { applyBackground(); });
     } else {
-        var themeBgUrl = "themes/" + themeId + "/background.jpg";
+        var themeBgUrl = getThemeFolder(String(themeId)) + "/background.jpg";
         fetch(themeBgUrl)
             .then(function(r) {
                 if (!r.ok) throw new Error("Image not found");
@@ -122,7 +126,7 @@ function createThemeCard(idStr, name, isActive) {
     var thumb = document.createElement("div");
     thumb.className = "theme-card__thumb";
     var img = document.createElement("img");
-    img.src = "themes/" + idStr + "/background.jpg";
+    img.src = getThemeFolder(idStr) + "/background.jpg";
     img.alt = "";
     img.className = "theme-card__img";
     thumb.appendChild(img);
@@ -135,7 +139,7 @@ function createThemeCard(idStr, name, isActive) {
     card.appendChild(label);
 
     card.addEventListener("click", function () {
-        fetch("themes/" + idStr + "/theme.json")
+        fetch(getThemeFolder(idStr) + "/theme.json")
             .then(function (r) {
                 if (!r.ok) throw new Error("Theme not found");
                 return r.json();
@@ -331,7 +335,7 @@ applyThemesEnabledSetting();
 // When ch_theme is null the extension is on its very first launch.
 // Apply and fully persist theme 0 so null only ever occurs once.
 if (localStorage.getItem(STORAGE_KEYS.THEME) === null) {
-    fetch("themes/0/theme.json")
+    fetch("themes/included/0/theme.json")
         .then(function(r) {
             if (!r.ok) throw new Error("Not found");
             return r.json();
