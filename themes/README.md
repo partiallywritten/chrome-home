@@ -24,7 +24,7 @@ themes/
   included/
     0/
       theme.json         ← Default theme settings (id 0)
-      background.jpg     ← Default theme background image
+      background.jpg     ← Default theme background image (or background.webp)
     1/
       theme.json
       background.jpg
@@ -32,7 +32,7 @@ themes/
   community/
     nnt-forest/
       theme.json         ← Community theme (id "nnt-forest")
-      background.jpg
+      background.webp    ← Preferred format; background.jpg is also accepted
     ...
 ```
 
@@ -45,14 +45,14 @@ Themes are identified by their `id`. The id determines both the folder name and 
 
 ### Adding an Included theme (numeric id)
 1. Create a new numbered folder (e.g. `themes/included/6/`).
-2. Add a `background.jpg` — the background image for the theme.
+2. Add a `background.webp` (or `background.jpg`) — the background image for the theme.
 3. Add a `theme.json` — see schema below.
 4. Register the theme in `themes/included_themes.json` by appending `{ "id": 6, "name": "My Theme" }`.
 
 ### Adding a Community theme (nnt- id)
 1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"nnt-dark-ocean"`.
 2. Create the folder `themes/community/nnt-dark-ocean/`.
-3. Add a `background.jpg` and a `theme.json`.
+3. Add a `background.webp` (or `background.jpg`) and a `theme.json`.
 4. Register the theme in `themes/community_themes.json` by appending `{ "id": "nnt-dark-ocean", "name": "Dark Ocean" }`.
 5. Enable the **Enable Community Themes** toggle inside the theme browser. The theme will appear in the **Community** section.
 
@@ -197,8 +197,13 @@ An empty string (`""`) for a string field clears/resets that setting.
 
 > **Not in API:** `bgImageCap` is a user-only preference (set in the Background settings panel). It is intentionally excluded from `theme.json` so themes always respect the user's chosen image quality cap.
 
-### `background.jpg`
-The theme's background image must be named `background.jpg` and placed inside the theme folder.  
-It is applied as the page background whenever the theme is selected.  
-JPEG format is required; recommended size is 1920×1080 or larger.
+### Background image (`background.webp` / `background.jpg`)
+The theme's background image must be placed inside the theme folder.  
+It is applied as the page background whenever the theme is selected.
+
+**WebP is the preferred format** — name the file `background.webp`.  
+JPEG is supported as a fallback for older themes — name the file `background.jpg`.  
+When both files exist in the same theme folder, `background.webp` takes precedence.
+
+Recommended size is 1920×1080 or larger.
 

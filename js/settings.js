@@ -323,9 +323,13 @@ function exportUserTheme() {
     var fileName = themeId + ".zip";
 
     getBgImage(function (bgImage) {
-        function buildAndDownload(bgBytes) {
+        function bgFilenameFromMime(mime) {
+            return mime === "image/webp" ? "background.webp" : "background.jpg";
+        }
+
+        function buildAndDownload(bgBytes, bgFilename) {
             var files = [{ name: themeId + "/theme.json", data: jsonBytes }];
-            if (bgBytes) files.push({ name: themeId + "/background.jpg", data: bgBytes });
+            if (bgBytes) files.push({ name: themeId + "/" + (bgFilename || "background.jpg"), data: bgBytes });
             var zipBytes = buildZipBytes(files);
             var blob = new Blob([zipBytes], { type: "application/zip" });
             var url = URL.createObjectURL(blob);
@@ -343,7 +347,9 @@ function exportUserTheme() {
             return;
         }
         if (bgImage.startsWith("data:image/")) {
-            buildAndDownload(dataUrlToBytes(bgImage));
+            var mimeMatch = bgImage.match(/^data:(image\/[^;,]+)/);
+            var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+            buildAndDownload(dataUrlToBytes(bgImage), bgFilenameFromMime(mime));
             return;
         }
         var safeUrl = sanitizeHttpUrl(bgImage);
@@ -354,9 +360,13 @@ function exportUserTheme() {
         fetch(safeUrl)
             .then(function (r) {
                 if (!r.ok) throw new Error("Fetch failed");
-                return r.arrayBuffer();
+                var contentType = r.headers.get("content-type") || "";
+                var fetchedMime = contentType.split(";")[0].trim();
+                return r.arrayBuffer().then(function(buf) {
+                    return { buf: buf, mime: fetchedMime };
+                });
             })
-            .then(function (buf) { buildAndDownload(new Uint8Array(buf)); })
+            .then(function (result) { buildAndDownload(new Uint8Array(result.buf), bgFilenameFromMime(result.mime)); })
             .catch(function () { buildAndDownload(null); });
     });
 }

@@ -90,11 +90,17 @@ function applyThemePreset(theme, themeId) {
     if (!bgEnabled) {
         saveBgImage("", function() { applyBackground(); });
     } else {
-        var themeBgUrl = getThemeFolder(String(themeId)) + "/background.jpg";
-        fetch(themeBgUrl)
+        var themeFolder = getThemeFolder(String(themeId));
+        fetch(themeFolder + "/background.webp")
             .then(function(r) {
-                if (!r.ok) throw new Error("Image not found");
+                if (!r.ok) throw new Error("WebP not found");
                 return r.blob();
+            })
+            .catch(function() {
+                return fetch(themeFolder + "/background.jpg").then(function(r) {
+                    if (!r.ok) throw new Error("JPEG not found");
+                    return r.blob();
+                });
             })
             .then(function(blob) {
                 var reader = new FileReader();
@@ -144,7 +150,11 @@ function createThemeCard(idStr, name, isActive) {
     var thumb = document.createElement("div");
     thumb.className = "theme-card__thumb";
     var img = document.createElement("img");
-    img.src = getThemeFolder(idStr) + "/background.jpg";
+    img.src = getThemeFolder(idStr) + "/background.webp";
+    img.onerror = function() {
+        img.onerror = null;
+        img.src = getThemeFolder(idStr) + "/background.jpg";
+    };
     img.alt = "";
     img.className = "theme-card__img";
     thumb.appendChild(img);
