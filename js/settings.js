@@ -63,14 +63,8 @@ var exportThemeBtn = document.getElementById("export-theme-btn");
 var settingsBranding = document.getElementById("settings-branding");
 
 // --- Branding ---
-(function() {
-  var version = "1.0.0";
-  try {
-    var manifest = chrome.runtime.getManifest();
-    if (manifest && manifest.version) version = manifest.version;
-  } catch (e) {}
-  if (settingsBranding) settingsBranding.textContent = "NozyNT (v" + version + ")";
-})();
+const version = chrome.runtime.getManifest().version ?? "unknown";
+settingsBranding.textContent = "NozyNT (v" + version + ")";
 
 var searchForm = document.getElementById("search-form");
 var searchInput = document.getElementById("search-input");
