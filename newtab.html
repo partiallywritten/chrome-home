@@ -9,6 +9,7 @@
   </head>
   <body>
     <div id="background-layer" class="background-layer" aria-hidden="true"></div>
+    <video id="background-video" class="background-video bg-disabled" aria-hidden="true" autoplay loop muted playsinline></video>
     <!-- Main content -->
     <main class="container">
       <section class="clock-section">
@@ -165,7 +166,7 @@
           <div class="settings-section-content">
             <div class="setting-group">
               <div class="toggle-row">
-                <span class="setting-group-label">Enable Background Image</span>
+                <span class="setting-group-label">Enable Background</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="bg-image-toggle" checked />
                   <span class="toggle-slider"></span>
@@ -174,7 +175,7 @@
             </div>
             <div class="setting-group">
               <div class="label-row">
-                <label for="bg-image">Background Image URL</label>
+                <label for="bg-image">Background URL</label>
                 <button id="clear-bg" class="btn-inline-reset">clear</button>
               </div>
               <div class="input-row">
@@ -188,7 +189,7 @@
                 <button id="apply-bg" class="btn">Apply</button>
               </div>
               <div class="input-row">
-                <input type="file" id="bg-file" class="text-input file-input" accept="image/*" />
+                <input type="file" id="bg-file" class="text-input file-input" accept="image/*,video/mp4,video/webm" />
               </div>
               <span id="bg-image-error" class="field-error" aria-live="polite"></span>
             </div>

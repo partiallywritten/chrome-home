@@ -122,6 +122,28 @@ function readImageFile(file, errorElement, onSuccess) {
     reader.readAsDataURL(file);
 }
 
+var VIDEO_MAX_BYTES = 50 * 1024 * 1024; // 50 MB
+
+function readVideoFile(file, errorElement, onSuccess) {
+    if (!file) return;
+    if (file.type !== "video/mp4" && file.type !== "video/webm") {
+        if (errorElement) errorElement.textContent = "Please upload an mp4 or webm video file.";
+        return;
+    }
+    if (file.size > VIDEO_MAX_BYTES) {
+        if (errorElement) errorElement.textContent = "Video must be under 50 MB.";
+        return;
+    }
+    if (errorElement) errorElement.textContent = "";
+    onSuccess(file);
+}
+
+function syncBgCapSelectState() {
+    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
+    bgImageCapSelect.disabled = isVideo;
+    bgImageCapSelect.title = isVideo ? "Quality cap does not apply to video backgrounds." : "";
+}
+
 function processUrlInput(inputEl, errorEl, errorMessage, onSuccess) {
     var raw = inputEl.value.trim();
     if (!raw) return;
@@ -159,6 +181,21 @@ function getBgImageCapDimensions() {
 }
 
 function applyLocalBackgroundFile(file) {
+    if (!file) return;
+    if (file.type === "video/mp4" || file.type === "video/webm") {
+        readVideoFile(file, bgImageError, function(videoFile) {
+            bgImageInput.value = "";
+            bgImageInput.removeAttribute("aria-invalid");
+            markUserTheme();
+            saveBgVideo(videoFile, function() {
+                getBgImage(function(blobUrl) {
+                    setBodyBgVideo(blobUrl);
+                    syncBgCapSelectState();
+                });
+            });
+        });
+        return;
+    }
     readImageFile(file, bgImageError, function(dataUrl) {
         bgImageInput.value = "";
         bgImageInput.removeAttribute("aria-invalid");
@@ -167,16 +204,20 @@ function applyLocalBackgroundFile(file) {
         if (!dims) {
             setBodyBgImage(dataUrl);
             saveBgImage(dataUrl);
+            syncBgCapSelectState();
             return;
         }
         compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
             setBodyBgImage(compressed);
             saveBgImage(compressed);
+            syncBgCapSelectState();
         });
     });
 }
 
 function migrateBgImageForNewCap() {
+    // Video backgrounds are always stored in IDB regardless of cap — nothing to migrate.
+    if (localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video") return;
     getBgImage(function(current) {
         if (!current) return;
         var isLocal = current.startsWith("data:image/") || current.startsWith("blob:");
@@ -344,7 +385,10 @@ function exportUserTheme() {
 
     getBgImage(function (bgImage) {
         function bgFilenameFromMime(mime) {
-            return mime === "image/webp" ? "background.webp" : "background.jpg";
+            if (mime === "image/webp") return "background.webp";
+            if (mime === "video/mp4") return "background.mp4";
+            if (mime === "video/webm") return "background.webm";
+            return "background.jpg";
         }
 
         function buildAndDownload(bgBytes, bgFilename) {
@@ -373,9 +417,11 @@ function exportUserTheme() {
             return;
         }
         if (bgImage.startsWith("blob:")) {
+            var bgType = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE);
+            var blobFallbackMime = bgType === "video" ? "video/mp4" : "image/webp";
             fetch(bgImage)
                 .then(function(r) {
-                    var fetchedMime = (r.headers.get("content-type") || "image/webp").split(";")[0].trim();
+                    var fetchedMime = (r.headers.get("content-type") || blobFallbackMime).split(";")[0].trim();
                     return r.arrayBuffer().then(function(buf) {
                         return { buf: buf, mime: fetchedMime };
                     });
@@ -650,6 +696,7 @@ bgImageCapSelect.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_CAP, this.value);
     markUserTheme();
     migrateBgImageForNewCap();
+    syncBgCapSelectState();
 });
 
 bgFileInput.addEventListener("change", function() {
@@ -677,6 +724,7 @@ clearBgBtn.addEventListener("click", function() {
     bgImageInput.removeAttribute("aria-invalid");
     bgImageError.textContent = "";
     setBodyBgImage("");
+    syncBgCapSelectState();
 });
 
 // Font Controls
@@ -843,3 +891,6 @@ restoreDefaultsBtn.addEventListener("click", function() {
         restoreConfirmTimer = setTimeout(resetConfirmState, 3000);
     }
 });
+
+// Sync cap select disabled state on load (settings.js runs after defaults.js)
+syncBgCapSelectState();

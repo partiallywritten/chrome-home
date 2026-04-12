@@ -20,6 +20,7 @@ var DEFAULTS = {
 };
 
 var STORAGE_KEYS = {
+    BG_IMAGE_TYPE: "ch_bg_image_type",
     FAVORITES: "ch_favorites",
     FAVORITES_ENABLED: "ch_favorites_enabled",
     BG_COLOR: "ch_bg_color",
@@ -51,6 +52,7 @@ var STORAGE_KEYS = {
 // --- Cached DOM References ---
 var docStyle = document.documentElement.style;
 var backgroundLayer = document.getElementById("background-layer");
+var backgroundVideo = document.getElementById("background-video");
 
 // --- Core Utilities ---
 
@@ -182,10 +184,12 @@ function saveBgImage(value, callback) {
     var cb = callback || function() {};
     if (!value) {
         if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
+        localStorage.removeItem(STORAGE_KEYS.BG_IMAGE_TYPE);
         _clearBgIdb();
         chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, cb);
         return;
     }
+    localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, "image"); // only reached when value is non-empty
     var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
     if (cap === "default" && value.startsWith("data:image/") && _bgDb) {
         var blob = _dataUrlToBlob(value);
@@ -209,9 +213,33 @@ function saveBgImage(value, callback) {
     }
 }
 
+function saveBgVideo(blob, callback) {
+    localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
+    localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, "video");
+    var cb = callback || function() {};
+    if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
+    if (!_bgDb) { cb(); return; }
+    var tx = _bgDb.transaction("bg", "readwrite");
+    var req = tx.objectStore("bg").put(blob, "bg_image");
+    req.onsuccess = function() {
+        chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, cb);
+    };
+    req.onerror = function() { cb(); };
+}
+
 function setBodyBgImage(safeUrl) {
     backgroundLayer.classList.remove("bg-disabled");
     backgroundLayer.style.backgroundImage = safeUrl ? "url(" + JSON.stringify(safeUrl) + ")" : "";
+    backgroundVideo.pause();
+    backgroundVideo.removeAttribute("src");
+    backgroundVideo.classList.add("bg-disabled");
+}
+
+function setBodyBgVideo(safeUrl) {
+    backgroundLayer.classList.add("bg-disabled");
+    backgroundLayer.style.backgroundImage = "";
+    backgroundVideo.classList.remove("bg-disabled");
+    backgroundVideo.src = safeUrl;
 }
 
 // --- DOM Helpers ---
@@ -275,12 +303,16 @@ function applyBackground() {
     var bgImageInput = document.getElementById("bg-image");
     var bgImageToggle = document.getElementById("bg-image-toggle");
     var enabled = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_ENABLED) !== "false";
+    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
 
     if (bgImageToggle) bgImageToggle.checked = enabled;
 
     if (!enabled) {
         backgroundLayer.classList.add("bg-disabled");
         backgroundLayer.style.backgroundImage = "";
+        backgroundVideo.pause();
+        backgroundVideo.removeAttribute("src");
+        backgroundVideo.classList.add("bg-disabled");
         return;
     }
 
@@ -292,6 +324,10 @@ function applyBackground() {
         if (!image) {
             bgImageInput.value = "";
             // No custom image — CSS default already showing, nothing more to do
+            return;
+        }
+        if (isVideo && image.startsWith("blob:")) {
+            setBodyBgVideo(image);
             return;
         }
         var isLocalImage = image.startsWith("data:image/") || image.startsWith("blob:");
@@ -321,7 +357,11 @@ function applyBackgroundBrightness() {
 
 function applyBgImageCapSetting() {
     var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
-    document.getElementById("bg-image-cap").value = cap;
+    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
+    var capEl = document.getElementById("bg-image-cap");
+    capEl.value = cap;
+    capEl.disabled = isVideo;
+    capEl.title = isVideo ? "Quality cap does not apply to video backgrounds." : "";
 }
 
 function applyClockSettings() {
@@ -506,3 +546,19 @@ function addFavorite(name, url) {
     saveFavorites(favorites);
     renderFavorites(favorites);
 }
+
+// --- Video background lifecycle ---
+
+document.addEventListener("visibilitychange", function() {
+    if (!backgroundVideo.classList.contains("bg-disabled")) {
+        if (document.hidden) {
+            backgroundVideo.pause();
+        } else {
+            backgroundVideo.play().catch(function() {});
+        }
+    }
+});
+
+window.addEventListener("pagehide", function() {
+    if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
+});
