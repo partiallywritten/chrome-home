@@ -319,7 +319,7 @@ function exportUserTheme() {
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
     var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
-    var themeId = "chu-" + crc32(jsonBytes).toString(16).padStart(8, "0");
+    var themeId = "nnt-" + crc32(jsonBytes).toString(16).padStart(8, "0");
     var fileName = themeId + ".zip";
 
     getBgImage(function (bgImage) {

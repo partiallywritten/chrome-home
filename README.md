@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>Chrome Home</h1>
-  <img src="assets/chrome-home-preview.png" alt="Chrome Home Theme preview">
+  <h1>Nozy-NT</h1>
+  <img src="assets/nozy-nt-preview.png" alt="Nozy-NT Theme preview">
   <p>A highly customizable new tab extension for chrome that I use.</p>
 </div>
 
@@ -29,10 +29,10 @@
 
 
 ## Theming
-This extension supports theming via [theming API](/themes/README.md). It comes with set of themes made by me which will be shown under "Included" section in theme browser panel. See all available themes [here](https://github.com/partiallywritten/chrome-home/blob/main/themes/included_themes.json)
+This extension supports theming via [theming API](/themes/README.md). It comes with set of themes made by me which will be shown under "Included" section in theme browser panel. See all available themes [here](https://github.com/partiallywritten/Nozy-NT/blob/main/themes/included_themes.json)
 
 To install community themes:
- - Move the theme folder starting with "chu-" prefix inside the `themes` directory.
+ - Move the theme folder starting with "nnt-" prefix inside the `themes` directory.
  - Add entry to it via `themes/community_themes.json`.
  - Enable custom themes inside the "Browse Themes" panel.
 
@@ -40,7 +40,7 @@ See more info [here](/themes/README.md).
 
 
 ## Install
-- Download the [source code](https://github.com/partiallywritten/chrome-home/archive/refs/heads/main.zip) and unzip it.
+- Download the [source code](https://github.com/partiallywritten/Nozy-NT/archive/refs/heads/main.zip) and unzip it.
 - Head to `chrome://extensions` and enable developer mode.
 - Click load unpacked and select the unzipped folder.
 

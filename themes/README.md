@@ -1,6 +1,6 @@
-# Chrome Home — Theming API
+# Nozy-NT — Theming API
 
-This folder contains pre-made themes for the Chrome Home extension and documents the full theming API.
+This folder contains pre-made themes for the Nozy-NT extension and documents the full theming API.
 
 ---
 
@@ -26,7 +26,7 @@ theme_api.js → theme browser overlay and theme preset application
 themes/
   README.md              ← This file (theming API reference)
   included_themes.json   ← Registry of bundled (numeric-id) themes
-  community_themes.json  ← Registry of community (chu- prefix) themes
+  community_themes.json  ← Registry of community (nnt- prefix) themes
   included/
     0/
       theme.json         ← Default theme settings (id 0)
@@ -36,8 +36,8 @@ themes/
       background.jpg
     ...
   community/
-    chu-forest/
-      theme.json         ← Community theme (id "chu-forest")
+    nnt-forest/
+      theme.json         ← Community theme (id "nnt-forest")
       background.jpg
     ...
 ```
@@ -71,11 +71,11 @@ The `id` field determines both the folder name and which section the theme appea
 | Id type | Example | Registry file | Section | Folder |
 |---------|---------|---------------|---------|--------|
 | Non-negative integer | `0`, `1`, `2` | `included_themes.json` | **Included** | `themes/included/0/`, `themes/included/1/`, … |
-| String prefixed `chu-` | `"chu-forest"` | `community_themes.json` | **Community** | `themes/community/chu-forest/` |
+| String prefixed `nnt-` | `"nnt-forest"` | `community_themes.json` | **Community** | `themes/community/nnt-forest/` |
 
 - **Included** themes (numeric ids) are reserved for themes bundled with the extension.  
   Theme `0` is always the built-in default applied on first launch.
-- **Community** themes (ids starting with `"chu-"`) are user-contributed or externally added themes. The `chu-` prefix is followed by a slug containing only letters, digits, hyphens, and underscores (e.g. `"chu-dark-ocean"`).
+- **Community** themes (ids starting with `"nnt-"`) are user-contributed or externally added themes. The `nnt-` prefix is followed by a slug containing only letters, digits, hyphens, and underscores (e.g. `"nnt-dark-ocean"`).
 - Any entry with an id that does not match either rule is silently ignored by the theme browser.
 
 ---
@@ -89,12 +89,12 @@ The `id` field determines both the folder name and which section the theme appea
 3. Add a `theme.json` — see schema below.
 4. Register the theme in `themes/included_themes.json` by appending `{ "id": 6, "name": "My Theme" }`.
 
-### Adding a Community theme (chu- id)
+### Adding a Community theme (nnt- id)
 
-1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"chu-dark-ocean"`.
-2. Create the folder `themes/community/chu-dark-ocean/`.
+1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"nnt-dark-ocean"`.
+2. Create the folder `themes/community/nnt-dark-ocean/`.
 3. Add a `background.jpg` and a `theme.json`.
-4. Register the theme in `themes/community_themes.json` by appending `{ "id": "chu-dark-ocean", "name": "Dark Ocean" }`.
+4. Register the theme in `themes/community_themes.json` by appending `{ "id": "nnt-dark-ocean", "name": "Dark Ocean" }`.
 5. Enable the **Enable Community Themes** toggle inside the theme browser. The theme will appear in the **Community** section.
 
 ### `themes/included_themes.json` — Included Registry
@@ -110,12 +110,12 @@ An array of included theme descriptor objects (numeric ids only):
 
 ### `themes/community_themes.json` — Community Registry
 
-An array of community theme descriptor objects (`chu-` ids only):
+An array of community theme descriptor objects (`nnt-` ids only):
 
 ```json
 [
-  { "id": "chu-forest", "name": "Forest" },
-  { "id": "chu-dark-ocean", "name": "Dark Ocean" }
+  { "id": "nnt-forest", "name": "Forest" },
+  { "id": "nnt-dark-ocean", "name": "Dark Ocean" }
 ]
 ```
 
@@ -123,7 +123,7 @@ An array of community theme descriptor objects (`chu-` ids only):
 
 | Field  | Type             | Required | Description                                                                 |
 |--------|------------------|----------|-----------------------------------------------------------------------------|
-| `id`   | number or string | yes      | Unique theme id. A non-negative integer for `included_themes.json`; a string starting with `"chu-"` (followed by `[a-zA-Z0-9_-]+`) for `community_themes.json`. Must match the folder name exactly. |
+| `id`   | number or string | yes      | Unique theme id. A non-negative integer for `included_themes.json`; a string starting with `"nnt-"` (followed by `[a-zA-Z0-9_-]+`) for `community_themes.json`. Must match the folder name exactly. |
 | `name` | string           | yes      | Display name shown in the theme browser |
 
 ---
