@@ -81,9 +81,57 @@ function sanitizeHttpUrl(raw) {
     }
 }
 
+// --- IndexedDB for Default-cap background ---
+
+var _bgObjectUrl = null;
+var _bgDb = null;
+var _bgDbReady = false;
+var _bgDbFailed = false;
+var _bgDbCallbacks = [];
+
+(function _openBgDb() {
+    var req = indexedDB.open("nozy-bg", 1);
+    req.onupgradeneeded = function(e) {
+        e.target.result.createObjectStore("bg");
+    };
+    req.onsuccess = function(e) {
+        _bgDb = e.target.result;
+        _bgDbReady = true;
+        var cbs = _bgDbCallbacks.splice(0);
+        cbs.forEach(function(fn) { fn(); });
+    };
+    req.onerror = function() {
+        _bgDbFailed = true;
+        var cbs = _bgDbCallbacks.splice(0);
+        cbs.forEach(function(fn) { fn(); });
+    };
+}());
+
+function _whenBgDbReady(fn) {
+    if (_bgDbReady || _bgDbFailed) { fn(); } else { _bgDbCallbacks.push(fn); }
+}
+
+function _dataUrlToBlob(dataUrl) {
+    var arr = dataUrl.split(",");
+    var mimeMatch = arr[0].match(/:(.*?);/);
+    var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+    var bstr = atob(arr[1]);
+    var n = bstr.length;
+    var u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], { type: mime });
+}
+
+function _clearBgIdb(callback) {
+    if (!_bgDb) { if (callback) callback(); return; }
+    var tx = _bgDb.transaction("bg", "readwrite");
+    var req = tx.objectStore("bg").delete("bg_image");
+    req.onsuccess = req.onerror = callback || function() {};
+}
+
 // --- Background Helpers ---
 
-function getBgImage(callback) {
+function _getBgFromChromeStorage(callback) {
     chrome.storage.local.get([STORAGE_KEYS.BG_IMAGE], function(result) {
         var stored = result[STORAGE_KEYS.BG_IMAGE];
         if (stored) {
@@ -104,14 +152,56 @@ function getBgImage(callback) {
     });
 }
 
+function getBgImage(callback) {
+    _whenBgDbReady(function() {
+        if (_bgDb) {
+            var tx = _bgDb.transaction("bg", "readonly");
+            var req = tx.objectStore("bg").get("bg_image");
+            req.onsuccess = function() {
+                var blob = req.result;
+                if (blob instanceof Blob) {
+                    if (_bgObjectUrl) URL.revokeObjectURL(_bgObjectUrl);
+                    _bgObjectUrl = URL.createObjectURL(blob);
+                    callback(_bgObjectUrl);
+                    return;
+                }
+                _getBgFromChromeStorage(callback);
+            };
+            req.onerror = function() {
+                _getBgFromChromeStorage(callback);
+            };
+        } else {
+            _getBgFromChromeStorage(callback);
+        }
+    });
+}
+
 function saveBgImage(value, callback) {
     localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
-    if (value) {
+    var cb = callback || function() {};
+    if (!value) {
+        _clearBgIdb();
+        chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, cb);
+        return;
+    }
+    var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    if (cap === "default" && value.startsWith("data:image/") && _bgDb) {
+        var blob = _dataUrlToBlob(value);
+        var tx = _bgDb.transaction("bg", "readwrite");
+        var req = tx.objectStore("bg").put(blob, "bg_image");
+        req.onsuccess = function() {
+            chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, cb);
+        };
+        req.onerror = function() {
+            var obj = {};
+            obj[STORAGE_KEYS.BG_IMAGE] = value;
+            chrome.storage.local.set(obj, cb);
+        };
+    } else {
+        _clearBgIdb();
         var obj = {};
         obj[STORAGE_KEYS.BG_IMAGE] = value;
-        chrome.storage.local.set(obj, callback || function() {});
-    } else {
-        chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, callback || function() {});
+        chrome.storage.local.set(obj, cb);
     }
 }
 
@@ -200,8 +290,8 @@ function applyBackground() {
             // No custom image — CSS default already showing, nothing more to do
             return;
         }
-        var isLocalDataImage = image.startsWith("data:image/");
-        var safeRemoteUrl = isLocalDataImage ? image : sanitizeHttpUrl(image);
+        var isLocalImage = image.startsWith("data:image/") || image.startsWith("blob:");
+        var safeRemoteUrl = isLocalImage ? image : sanitizeHttpUrl(image);
 
         if (!safeRemoteUrl) {
             saveBgImage("");
@@ -209,7 +299,7 @@ function applyBackground() {
             return;
         }
         setBodyBgImage(safeRemoteUrl);
-        bgImageInput.value = isLocalDataImage ? "" : safeRemoteUrl;
+        bgImageInput.value = isLocalImage ? "" : safeRemoteUrl;
     });
 }
 

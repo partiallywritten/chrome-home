@@ -176,6 +176,26 @@ function applyLocalBackgroundFile(file) {
     });
 }
 
+function migrateBgImageForNewCap() {
+    getBgImage(function(current) {
+        if (!current) return;
+        var isLocal = current.startsWith("data:image/") || current.startsWith("blob:");
+        if (!isLocal) return; // remote URLs live in chrome.storage.local regardless of cap
+        var dims = getBgImageCapDimensions();
+        if (!dims) {
+            // Moving to "default" — only migrate if the image is currently in chrome.storage.local
+            if (current.startsWith("blob:")) return; // already in IDB, nothing to do
+            saveBgImage(current); // routes to IDB since cap is now "default"
+        } else {
+            // Moving to a sized cap — compress and save to chrome.storage.local
+            compressImage(current, dims.width, dims.height, 0.8, function(compressed) {
+                setBodyBgImage(compressed);
+                saveBgImage(compressed); // routes to chrome.storage.local since cap != "default"
+            });
+        }
+    });
+}
+
 function applyLocalFaviconFile(file) {
     readImageFile(file, faviconUrlError, function(dataUrl) {
         faviconUrlInput.value = "";
@@ -350,6 +370,18 @@ function exportUserTheme() {
             var mimeMatch = bgImage.match(/^data:(image\/[^;,]+)/);
             var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
             buildAndDownload(dataUrlToBytes(bgImage), bgFilenameFromMime(mime));
+            return;
+        }
+        if (bgImage.startsWith("blob:")) {
+            fetch(bgImage)
+                .then(function(r) {
+                    var fetchedMime = (r.headers.get("content-type") || "image/webp").split(";")[0].trim();
+                    return r.arrayBuffer().then(function(buf) {
+                        return { buf: buf, mime: fetchedMime };
+                    });
+                })
+                .then(function(res) { buildAndDownload(new Uint8Array(res.buf), bgFilenameFromMime(res.mime)); })
+                .catch(function() { buildAndDownload(null); });
             return;
         }
         var safeUrl = sanitizeHttpUrl(bgImage);
@@ -617,6 +649,7 @@ bgBrightnessInput.addEventListener("input", function() {
 bgImageCapSelect.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_CAP, this.value);
     markUserTheme();
+    migrateBgImageForNewCap();
 });
 
 bgFileInput.addEventListener("change", function() {
