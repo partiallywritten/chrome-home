@@ -606,6 +606,28 @@ input[type="range"] {
   padding: 0.42rem 0.55rem;
 }
 
+.setting-inline-label {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.size-cap-input {
+  width: 5rem;
+  flex: 0 0 auto;
+}
+
+.size-cap-unit {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 input[type="range"] {
   accent-color: var(--accent);
 }

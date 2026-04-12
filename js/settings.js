@@ -23,6 +23,7 @@ var applyBgBtn = document.getElementById("apply-bg");
 var clearBgBtn = document.getElementById("clear-bg");
 var bgBrightnessInput = document.getElementById("bg-brightness");
 var bgImageCapSelect = document.getElementById("bg-image-cap");
+var bgFileSizeCapInput = document.getElementById("bg-file-size-cap");
 var bgImageToggle = document.getElementById("bg-image-toggle");
 
 var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
@@ -100,10 +101,25 @@ function compressImage(dataUrl, maxWidth, maxHeight, quality, callback) {
     img.src = dataUrl;
 }
 
+function clampFileSizeCap(val) {
+    return (Number.isFinite(val) && val > 0 && val <= MAX_FILE_SIZE_MB) ? val : Number(DEFAULTS.BG_FILE_SIZE_CAP);
+}
+
+function getBgFileSizeCapBytes() {
+    var raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
+    return clampFileSizeCap(Number(raw)) * 1024 * 1024;
+}
+
 function readImageFile(file, errorElement, onSuccess) {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
         if (errorElement) errorElement.textContent = "Please upload an image file.";
+        return;
+    }
+    var maxBytes = getBgFileSizeCapBytes();
+    if (file.size > maxBytes) {
+        var mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = "File must be under " + mb + " MB.";
         return;
     }
     var reader = new FileReader();
@@ -122,16 +138,16 @@ function readImageFile(file, errorElement, onSuccess) {
     reader.readAsDataURL(file);
 }
 
-var VIDEO_MAX_BYTES = 50 * 1024 * 1024; // 50 MB
-
 function readVideoFile(file, errorElement, onSuccess) {
     if (!file) return;
     if (file.type !== "video/mp4" && file.type !== "video/webm") {
         if (errorElement) errorElement.textContent = "Please upload an mp4 or webm video file.";
         return;
     }
-    if (file.size > VIDEO_MAX_BYTES) {
-        if (errorElement) errorElement.textContent = "Video must be under 50 MB.";
+    var maxBytes = getBgFileSizeCapBytes();
+    if (file.size > maxBytes) {
+        var mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = "Video must be under " + mb + " MB.";
         return;
     }
     if (errorElement) errorElement.textContent = "";
@@ -697,6 +713,13 @@ bgImageCapSelect.addEventListener("change", function() {
     markUserTheme();
     migrateBgImageForNewCap();
     syncBgCapSelectState();
+});
+
+bgFileSizeCapInput.addEventListener("change", function() {
+    var val = clampFileSizeCap(Number(this.value));
+    this.value = String(val);
+    localStorage.setItem(STORAGE_KEYS.BG_FILE_SIZE_CAP, String(val));
+    markUserTheme();
 });
 
 bgFileInput.addEventListener("change", function() {

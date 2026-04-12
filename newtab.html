@@ -174,8 +174,37 @@
               </div>
             </div>
             <div class="setting-group">
+              <label for="bg-brightness">Image Brightness</label>
+              <input type="range" id="bg-brightness" min="-100" max="100" step="1" value="0" />
+            </div>
+            <div class="setting-group">
+              <label for="bg-image-cap">Image Quality Cap</label>
+              <select id="bg-image-cap" class="text-input">
+                <option value="default">Default (no scaling)</option>
+                <option value="1080p">1080p (1920×1080)</option>
+                <option value="1440p">1440p (2560×1440)</option>
+                <option value="4K">4K (3840×2160)</option>
+              </select>
+            </div>
+            <div class="setting-group">
+              <div class="input-row">
+                <label for="bg-file-size-cap" class="setting-inline-label">Max file size</label>
+                <input
+                  type="number"
+                  id="bg-file-size-cap"
+                  class="text-input size-cap-input"
+                  min="1"
+                  max="250"
+                  step="1"
+                  value="50"
+                  aria-label="Max file size in MB"
+                />
+                <span class="size-cap-unit">MB</span>
+              </div>
+            </div>
+            <div class="setting-group">
               <div class="label-row">
-                <label for="bg-image">Background URL</label>
+                <label for="bg-image">Background Source</label>
                 <button id="clear-bg" class="btn-inline-reset">clear</button>
               </div>
               <div class="input-row">
@@ -192,19 +221,6 @@
                 <input type="file" id="bg-file" class="text-input file-input" accept="image/*,video/mp4,video/webm" />
               </div>
               <span id="bg-image-error" class="field-error" aria-live="polite"></span>
-            </div>
-            <div class="setting-group">
-              <label for="bg-brightness">Image Darken/Brighten</label>
-              <input type="range" id="bg-brightness" min="-100" max="100" step="1" value="0" />
-            </div>
-            <div class="setting-group">
-              <label for="bg-image-cap">Image Quality Cap</label>
-              <select id="bg-image-cap" class="text-input">
-                <option value="default">Default (no scaling)</option>
-                <option value="1080p">1080p (1920×1080)</option>
-                <option value="1440p">1440p (2560×1440)</option>
-                <option value="4K">4K (3840×2160)</option>
-              </select>
             </div>
           </div>
         </details>

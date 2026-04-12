@@ -16,11 +16,15 @@ var DEFAULTS = {
     TAB_NAME: "",
     FAVICON: "",
     BG_IMAGE_CAP: "1080p",
+    BG_FILE_SIZE_CAP: "50",
     SEARCH_URL: "https://www.google.com/search?q={query}",
 };
 
+var MAX_FILE_SIZE_MB = 250;
+
 var STORAGE_KEYS = {
     BG_IMAGE_TYPE: "ch_bg_image_type",
+    BG_FILE_SIZE_CAP: "ch_bg_file_size_cap",
     FAVORITES: "ch_favorites",
     FAVORITES_ENABLED: "ch_favorites_enabled",
     BG_COLOR: "ch_bg_color",
@@ -362,6 +366,13 @@ function applyBgImageCapSetting() {
     capEl.value = cap;
     capEl.disabled = isVideo;
     capEl.title = isVideo ? "Quality cap does not apply to video backgrounds." : "";
+}
+
+function applyBgFileSizeCapSetting() {
+    var raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
+    var val = Number(raw);
+    var capped = (Number.isFinite(val) && val > 0 && val <= MAX_FILE_SIZE_MB) ? val : Number(DEFAULTS.BG_FILE_SIZE_CAP);
+    document.getElementById("bg-file-size-cap").value = String(capped);
 }
 
 function applyClockSettings() {
