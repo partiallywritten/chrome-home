@@ -123,9 +123,8 @@ function _dataUrlToBlob(dataUrl) {
     var mimeMatch = arr[0].match(/:(.*?);/);
     var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
     var bstr = atob(arr[1]);
-    var n = bstr.length;
-    var u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    var u8arr = new Uint8Array(bstr.length);
+    for (var i = 0; i < bstr.length; i++) u8arr[i] = bstr.charCodeAt(i);
     return new Blob([u8arr], { type: mime });
 }
 
@@ -217,9 +216,12 @@ function saveBgImage(value, callback) {
     }
 }
 
-function saveBgVideo(blob, callback) {
+// Stores a media blob directly in IndexedDB and clears any stale data from
+// chrome.storage.local. BG_IMAGE_TYPE tracks what kind of background is active;
+// the actual data lives in IDB (read back via getBgImage → createObjectURL).
+function _saveBlobToIdb(blob, mediaType, callback) {
     localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
-    localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, "video");
+    localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, mediaType);
     var cb = callback || function() {};
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
     if (!_bgDb) { cb(); return; }
@@ -229,6 +231,14 @@ function saveBgVideo(blob, callback) {
         chrome.storage.local.remove(STORAGE_KEYS.BG_IMAGE, cb);
     };
     req.onerror = function() { cb(); };
+}
+
+function saveBgVideo(blob, callback) {
+    _saveBlobToIdb(blob, "video", callback);
+}
+
+function saveBgImageBlob(blob, callback) {
+    _saveBlobToIdb(blob, "image", callback);
 }
 
 function setBodyBgImage(safeUrl) {

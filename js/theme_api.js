@@ -103,24 +103,22 @@ function applyThemePreset(theme, themeId) {
                 });
             })
             .then(function(blob) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var dataUrl = String(e.target.result);
-                    var dims = getBgImageCapDimensions();
-                    if (!dims) {
-                        setBodyBgImage(dataUrl);
-                        saveBgImage(dataUrl);
-                    } else {
-                        compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
-                            setBodyBgImage(compressed);
-                            saveBgImage(compressed);
+                var dims = getBgImageCapDimensions();
+                if (!dims) {
+                    saveBgImageBlob(blob, function() {
+                        getBgImage(function(url) {
+                            if (url) setBodyBgImage(url);
+                            else applyBackground();
                         });
-                    }
-                };
-                reader.onerror = function() {
-                    applyBackground();
-                };
-                reader.readAsDataURL(blob);
+                    });
+                } else {
+                    var objUrl = URL.createObjectURL(blob);
+                    compressImage(objUrl, dims.width, dims.height, 0.8, function(compressed) {
+                        URL.revokeObjectURL(objUrl);
+                        setBodyBgImage(compressed);
+                        saveBgImage(compressed);
+                    });
+                }
             })
             .catch(function() {
                 applyBackground();

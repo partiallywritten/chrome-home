@@ -652,19 +652,25 @@ textColorHexInput.addEventListener("input", function() {
 
 // Clock Inputs
 clockSizeInput.addEventListener("input", function() {
-    localStorage.setItem(STORAGE_KEYS.CLOCK_SIZE, this.value);
-    markUserTheme();
     docStyle.setProperty("--clock-size", `${this.value}rem`);
 });
-clockXInput.addEventListener("input", function() {
-    localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
+clockSizeInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.CLOCK_SIZE, this.value);
     markUserTheme();
+});
+clockXInput.addEventListener("input", function() {
     docStyle.setProperty("--clock-x", `${this.value}px`);
 });
+clockXInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
+    markUserTheme();
+});
 clockYInput.addEventListener("input", function() {
+    docStyle.setProperty("--clock-y", `${this.value}px`);
+});
+clockYInput.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
     markUserTheme();
-    docStyle.setProperty("--clock-y", `${this.value}px`);
 });
 clockHiddenToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_HIDDEN, this.checked ? "true" : "false");
@@ -677,16 +683,22 @@ dateHiddenToggle.addEventListener("change", function() {
 
 // Search Bar Controls
 searchWidthInput.addEventListener("input", function() {
-    localStorage.setItem(STORAGE_KEYS.SEARCH_WIDTH, this.value);
     docStyle.setProperty("--search-width", `${this.value}px`);
 });
+searchWidthInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_WIDTH, this.value);
+});
 searchXInput.addEventListener("input", function() {
-    localStorage.setItem(STORAGE_KEYS.SEARCH_X, this.value);
     docStyle.setProperty("--search-x", `${this.value}px`);
 });
+searchXInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_X, this.value);
+});
 searchYInput.addEventListener("input", function() {
-    localStorage.setItem(STORAGE_KEYS.SEARCH_Y, this.value);
     docStyle.setProperty("--search-y", `${this.value}px`);
+});
+searchYInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.SEARCH_Y, this.value);
 });
 
 // Background Controls
@@ -703,9 +715,11 @@ favoritesEnabledToggle.addEventListener("change", function() {
 });
 
 bgBrightnessInput.addEventListener("input", function() {
+    docStyle.setProperty("--bg-image-brightness", String(brightnessScale(this.value)));
+});
+bgBrightnessInput.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_BRIGHTNESS, this.value);
     markUserTheme();
-    docStyle.setProperty("--bg-image-brightness", String(brightnessScale(this.value)));
 });
 
 bgImageCapSelect.addEventListener("change", function() {
