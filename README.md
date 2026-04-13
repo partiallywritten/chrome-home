@@ -25,7 +25,7 @@ Best way to explore the customizations is by downloading the extension and headi
     - Search bar postion in x,y coordinates (adjusted via sliders. has limitations in freedom).
 - Background
     - Colored background (disable background image)
-    - Background image via either local file or url
+    - Static / **Animated** background via either local file or url
     - Background image quality cap (in which resolution the background image should be saved. recommended is `1080p`)
 - Theme
     - Enable themes: This unlocks custom themes. Click on "Browse Themes" to explore themes
