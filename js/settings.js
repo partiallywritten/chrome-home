@@ -257,6 +257,7 @@ function applyLocalBackgroundFile(file) {
         if (file.type === "image/webp") {
             isAnimatedWebpFile(file, function(animated) {
                 if (animated) forceBgCapToDefault();
+                // Read dims after forceBgCapToDefault() so animated WebPs always get null dims
                 var dims = getBgImageCapDimensions();
                 if (!dims) {
                     setBodyBgImage(dataUrl);
