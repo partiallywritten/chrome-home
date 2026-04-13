@@ -217,7 +217,7 @@ function applyLocalBackgroundFile(file) {
         bgImageInput.removeAttribute("aria-invalid");
         markUserTheme();
         var dims = getBgImageCapDimensions();
-        if (!dims) {
+        if (!dims || file.type === "image/gif") {
             setBodyBgImage(dataUrl);
             saveBgImage(dataUrl);
             syncBgCapSelectState();
@@ -245,6 +245,11 @@ function migrateBgImageForNewCap() {
             saveBgImage(current); // routes to IDB since cap is now "default"
         } else {
             // Moving to a sized cap — compress and save to chrome.storage.local
+            // GIFs must not be re-compressed (canvas strips animation)
+            if (current.startsWith("data:image/gif")) {
+                saveBgImage(current);
+                return;
+            }
             compressImage(current, dims.width, dims.height, 0.8, function(compressed) {
                 setBodyBgImage(compressed);
                 saveBgImage(compressed); // routes to chrome.storage.local since cap != "default"
