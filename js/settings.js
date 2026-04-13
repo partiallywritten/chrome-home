@@ -23,6 +23,7 @@ var applyBgBtn = document.getElementById("apply-bg");
 var clearBgBtn = document.getElementById("clear-bg");
 var bgBrightnessInput = document.getElementById("bg-brightness");
 var bgImageCapSelect = document.getElementById("bg-image-cap");
+var bgFileSizeCapInput = document.getElementById("bg-file-size-cap");
 var bgImageToggle = document.getElementById("bg-image-toggle");
 
 var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
@@ -100,10 +101,25 @@ function compressImage(dataUrl, maxWidth, maxHeight, quality, callback) {
     img.src = dataUrl;
 }
 
+function clampFileSizeCap(val) {
+    return (Number.isFinite(val) && val > 0 && val <= MAX_FILE_SIZE_MB) ? val : Number(DEFAULTS.BG_FILE_SIZE_CAP);
+}
+
+function getBgFileSizeCapBytes() {
+    var raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
+    return clampFileSizeCap(Number(raw)) * 1024 * 1024;
+}
+
 function readImageFile(file, errorElement, onSuccess) {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
         if (errorElement) errorElement.textContent = "Please upload an image file.";
+        return;
+    }
+    var maxBytes = getBgFileSizeCapBytes();
+    if (file.size > maxBytes) {
+        var mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = "File must be under " + mb + " MB.";
         return;
     }
     var reader = new FileReader();
@@ -120,6 +136,28 @@ function readImageFile(file, errorElement, onSuccess) {
         if (errorElement) errorElement.textContent = "Could not read this image.";
     };
     reader.readAsDataURL(file);
+}
+
+function readVideoFile(file, errorElement, onSuccess) {
+    if (!file) return;
+    if (file.type !== "video/mp4" && file.type !== "video/webm") {
+        if (errorElement) errorElement.textContent = "Please upload an mp4 or webm video file.";
+        return;
+    }
+    var maxBytes = getBgFileSizeCapBytes();
+    if (file.size > maxBytes) {
+        var mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = "Video must be under " + mb + " MB.";
+        return;
+    }
+    if (errorElement) errorElement.textContent = "";
+    onSuccess(file);
+}
+
+function syncBgCapSelectState() {
+    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
+    bgImageCapSelect.disabled = isVideo;
+    bgImageCapSelect.title = isVideo ? "Quality cap does not apply to video backgrounds." : "";
 }
 
 function processUrlInput(inputEl, errorEl, errorMessage, onSuccess) {
@@ -159,6 +197,21 @@ function getBgImageCapDimensions() {
 }
 
 function applyLocalBackgroundFile(file) {
+    if (!file) return;
+    if (file.type === "video/mp4" || file.type === "video/webm") {
+        readVideoFile(file, bgImageError, function(videoFile) {
+            bgImageInput.value = "";
+            bgImageInput.removeAttribute("aria-invalid");
+            markUserTheme();
+            saveBgVideo(videoFile, function() {
+                getBgImage(function(blobUrl) {
+                    setBodyBgVideo(blobUrl);
+                    syncBgCapSelectState();
+                });
+            });
+        });
+        return;
+    }
     readImageFile(file, bgImageError, function(dataUrl) {
         bgImageInput.value = "";
         bgImageInput.removeAttribute("aria-invalid");
@@ -167,12 +220,36 @@ function applyLocalBackgroundFile(file) {
         if (!dims) {
             setBodyBgImage(dataUrl);
             saveBgImage(dataUrl);
+            syncBgCapSelectState();
             return;
         }
         compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
             setBodyBgImage(compressed);
             saveBgImage(compressed);
+            syncBgCapSelectState();
         });
+    });
+}
+
+function migrateBgImageForNewCap() {
+    // Video backgrounds are always stored in IDB regardless of cap — nothing to migrate.
+    if (localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video") return;
+    getBgImage(function(current) {
+        if (!current) return;
+        var isLocal = current.startsWith("data:image/") || current.startsWith("blob:");
+        if (!isLocal) return; // remote URLs live in chrome.storage.local regardless of cap
+        var dims = getBgImageCapDimensions();
+        if (!dims) {
+            // Moving to "default" — only migrate if the image is currently in chrome.storage.local
+            if (current.startsWith("blob:")) return; // already in IDB, nothing to do
+            saveBgImage(current); // routes to IDB since cap is now "default"
+        } else {
+            // Moving to a sized cap — compress and save to chrome.storage.local
+            compressImage(current, dims.width, dims.height, 0.8, function(compressed) {
+                setBodyBgImage(compressed);
+                saveBgImage(compressed); // routes to chrome.storage.local since cap != "default"
+            });
+        }
     });
 }
 
@@ -324,7 +401,10 @@ function exportUserTheme() {
 
     getBgImage(function (bgImage) {
         function bgFilenameFromMime(mime) {
-            return mime === "image/webp" ? "background.webp" : "background.jpg";
+            if (mime === "image/webp") return "background.webp";
+            if (mime === "video/mp4") return "background.mp4";
+            if (mime === "video/webm") return "background.webm";
+            return "background.jpg";
         }
 
         function buildAndDownload(bgBytes, bgFilename) {
@@ -350,6 +430,20 @@ function exportUserTheme() {
             var mimeMatch = bgImage.match(/^data:(image\/[^;,]+)/);
             var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
             buildAndDownload(dataUrlToBytes(bgImage), bgFilenameFromMime(mime));
+            return;
+        }
+        if (bgImage.startsWith("blob:")) {
+            var bgType = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE);
+            var blobFallbackMime = bgType === "video" ? "video/mp4" : "image/webp";
+            fetch(bgImage)
+                .then(function(r) {
+                    var fetchedMime = (r.headers.get("content-type") || blobFallbackMime).split(";")[0].trim();
+                    return r.arrayBuffer().then(function(buf) {
+                        return { buf: buf, mime: fetchedMime };
+                    });
+                })
+                .then(function(res) { buildAndDownload(new Uint8Array(res.buf), bgFilenameFromMime(res.mime)); })
+                .catch(function() { buildAndDownload(null); });
             return;
         }
         var safeUrl = sanitizeHttpUrl(bgImage);
@@ -617,6 +711,15 @@ bgBrightnessInput.addEventListener("input", function() {
 bgImageCapSelect.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_CAP, this.value);
     markUserTheme();
+    migrateBgImageForNewCap();
+    syncBgCapSelectState();
+});
+
+bgFileSizeCapInput.addEventListener("change", function() {
+    var val = clampFileSizeCap(Number(this.value));
+    this.value = String(val);
+    localStorage.setItem(STORAGE_KEYS.BG_FILE_SIZE_CAP, String(val));
+    markUserTheme();
 });
 
 bgFileInput.addEventListener("change", function() {
@@ -644,6 +747,7 @@ clearBgBtn.addEventListener("click", function() {
     bgImageInput.removeAttribute("aria-invalid");
     bgImageError.textContent = "";
     setBodyBgImage("");
+    syncBgCapSelectState();
 });
 
 // Font Controls
@@ -810,3 +914,6 @@ restoreDefaultsBtn.addEventListener("click", function() {
         restoreConfirmTimer = setTimeout(resetConfirmState, 3000);
     }
 });
+
+// Sync cap select disabled state on load (settings.js runs after defaults.js)
+syncBgCapSelectState();

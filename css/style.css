@@ -64,6 +64,22 @@ body {
   background-image: none;
 }
 
+.background-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+  filter: brightness(var(--bg-image-brightness, 1));
+  will-change: transform;
+}
+
+.background-video.bg-disabled {
+  display: none;
+}
+
 /* ── Layout container ─────────────────────────────────────────── */
 .container {
   display: flex;
@@ -588,6 +604,28 @@ input[type="range"] {
 
 .file-input {
   padding: 0.42rem 0.55rem;
+}
+
+.setting-inline-label {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.size-cap-input {
+  width: 5rem;
+  flex: 0 0 auto;
+}
+
+.size-cap-unit {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 input[type="range"] {

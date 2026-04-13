@@ -26,6 +26,7 @@ applyThemeSettings();
 applyBackground();
 applyBackgroundBrightness();
 applyBgImageCapSetting();
+applyBgFileSizeCapSetting();
 applyClockSettings();
 applyClockVisibility();
 applySearchBarSettings();
