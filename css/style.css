@@ -378,14 +378,26 @@ body {
 }
 
 .settings-header {
+  padding: 1.2rem 1.35rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.settings-header__row1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.2rem 1.35rem;
-  border-bottom: 1px solid var(--border);
 }
 
-.settings-header__left {
+.settings-header__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.settings-header__row2 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -395,6 +407,23 @@ body {
   font-size: 1.02rem;
   font-weight: 500;
   color: var(--text);
+}
+
+.settings-version {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+.settings-update-notice {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #d9163e;
+}
+
+.settings-update-notice.hidden {
+  display: none;
 }
 
 .settings-body {

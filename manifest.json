@@ -9,6 +9,7 @@
     "128": "assets/icon-128.png"
   },
   "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": ["https://raw.githubusercontent.com/*"],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   }
