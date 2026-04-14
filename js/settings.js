@@ -532,6 +532,7 @@ function openSettings() {
     settingsPanel.setAttribute("aria-hidden", "false");
     applyThemesEnabledSetting();
     syncExportBtnVisibility();
+    updatePositionSliderLimits();
 }
 
 function closeSettingsPanel() {
@@ -712,6 +713,109 @@ textColorHexInput.addEventListener("input", function() {
     });
 });
 
+// --- Dynamic Position Slider Limits ---
+
+/**
+ * Recalculates and applies the min/max bounds for the clock and search-bar
+ * position sliders based on the current viewport size and the elements'
+ * rendered dimensions. A 1 rem invisible border is kept on every side so
+ * elements never touch the very edge of the page.
+ */
+function updatePositionSliderLimits() {
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var border = rem; // 1 rem padding on each edge
+
+    // Clock position limits
+    var clockSection = document.querySelector(".clock-section");
+    if (clockSection) {
+        var currentClockX = Number(clockXInput.value) || 0;
+        var currentClockY = Number(clockYInput.value) || 0;
+        var clockRect = clockSection.getBoundingClientRect();
+        if (clockRect.width > 0 && clockRect.height > 0) {
+            // Subtract current transform offset to get the element's natural position
+            var clockNatLeft   = clockRect.left   - currentClockX;
+            var clockNatRight  = clockRect.right  - currentClockX;
+            var clockNatTop    = clockRect.top    - currentClockY;
+            var clockNatBottom = clockRect.bottom - currentClockY;
+
+            var clockMaxX = Math.floor(vw - border - clockNatRight);
+            var clockMinX = Math.ceil(border - clockNatLeft);
+            var clockMaxY = Math.floor(vh - border - clockNatBottom);
+            var clockMinY = Math.ceil(border - clockNatTop);
+
+            // Guard: element wider/taller than usable space — allow centering at 0
+            if (clockMinX > clockMaxX) { clockMinX = 0; clockMaxX = 0; }
+            if (clockMinY > clockMaxY) { clockMinY = 0; clockMaxY = 0; }
+
+            clockXInput.min = clockMinX;
+            clockXInput.max = clockMaxX;
+            clockYInput.min = clockMinY;
+            clockYInput.max = clockMaxY;
+
+            // Re-derive the displayed position from the stored fraction and clamp it
+            // so the element stays on-screen after every resize.
+            var clockXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_X) || 0, vw);
+            var clockYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || 0, vh);
+            var clockXClamped = Math.min(clockMaxX, Math.max(clockMinX, clockXIdeal));
+            var clockYClamped = Math.min(clockMaxY, Math.max(clockMinY, clockYIdeal));
+            clockXInput.value = clockXClamped;
+            clockYInput.value = clockYClamped;
+            docStyle.setProperty("--clock-x", clockXClamped + "px");
+            docStyle.setProperty("--clock-y", clockYClamped + "px");
+        }
+    }
+
+    // Search bar position limits
+    // Use the search-form element for horizontal bounds (it has the visual width)
+    // and the search-section element for vertical bounds.
+    var searchSectionEl = document.querySelector(".search-section");
+    var searchFormEl = searchSectionEl && searchSectionEl.querySelector(".search-form");
+    if (searchSectionEl && searchFormEl) {
+        var currentSearchX = Number(searchXInput.value) || 0;
+        var currentSearchY = Number(searchYInput.value) || 0;
+        var formRect    = searchFormEl.getBoundingClientRect();
+        var sectionRect = searchSectionEl.getBoundingClientRect();
+        if (formRect.width > 0 && sectionRect.height > 0) {
+            var formNatLeft      = formRect.left      - currentSearchX;
+            var formNatRight     = formRect.right     - currentSearchX;
+            var sectionNatTop    = sectionRect.top    - currentSearchY;
+            var sectionNatBottom = sectionRect.bottom - currentSearchY;
+
+            var searchMaxX = Math.floor(vw - border - formNatRight);
+            var searchMinX = Math.ceil(border - formNatLeft);
+            var searchMaxY = Math.floor(vh - border - sectionNatBottom);
+            var searchMinY = Math.ceil(border - sectionNatTop);
+
+            if (searchMinX > searchMaxX) { searchMinX = 0; searchMaxX = 0; }
+            if (searchMinY > searchMaxY) { searchMinY = 0; searchMaxY = 0; }
+
+            searchXInput.min = searchMinX;
+            searchXInput.max = searchMaxX;
+            searchYInput.min = searchMinY;
+            searchYInput.max = searchMaxY;
+
+            // Re-derive the displayed position from the stored fraction and clamp it.
+            var searchXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_X) || 0, vw);
+            var searchYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || 0, vh);
+            var searchXClamped = Math.min(searchMaxX, Math.max(searchMinX, searchXIdeal));
+            var searchYClamped = Math.min(searchMaxY, Math.max(searchMinY, searchYIdeal));
+            searchXInput.value = searchXClamped;
+            searchYInput.value = searchYClamped;
+            docStyle.setProperty("--search-x", searchXClamped + "px");
+            docStyle.setProperty("--search-y", searchYClamped + "px");
+        }
+    }
+}
+
+// Debounced resize handler so limits stay accurate when the window changes size
+var _posLimitsResizeTimer = null;
+window.addEventListener("resize", function() {
+    clearTimeout(_posLimitsResizeTimer);
+    _posLimitsResizeTimer = setTimeout(updatePositionSliderLimits, 100);
+});
+
 // Clock Inputs
 clockSizeInput.addEventListener("input", function() {
     docStyle.setProperty("--clock-size", `${this.value}rem`);
@@ -719,19 +823,21 @@ clockSizeInput.addEventListener("input", function() {
 clockSizeInput.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.CLOCK_SIZE, this.value);
     markUserTheme();
+    // Clock element size may have changed — refresh position limits
+    requestAnimationFrame(updatePositionSliderLimits);
 });
 clockXInput.addEventListener("input", function() {
     docStyle.setProperty("--clock-x", `${this.value}px`);
 });
 clockXInput.addEventListener("change", function() {
-    localStorage.setItem(STORAGE_KEYS.CLOCK_X, this.value);
+    localStorage.setItem(STORAGE_KEYS.CLOCK_X, String(Number(this.value) / window.innerWidth));
     markUserTheme();
 });
 clockYInput.addEventListener("input", function() {
     docStyle.setProperty("--clock-y", `${this.value}px`);
 });
 clockYInput.addEventListener("change", function() {
-    localStorage.setItem(STORAGE_KEYS.CLOCK_Y, this.value);
+    localStorage.setItem(STORAGE_KEYS.CLOCK_Y, String(Number(this.value) / window.innerHeight));
     markUserTheme();
 });
 clockHiddenToggle.addEventListener("change", function() {
@@ -749,18 +855,23 @@ searchWidthInput.addEventListener("input", function() {
 });
 searchWidthInput.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.SEARCH_WIDTH, this.value);
+    markUserTheme();
+    // Search form width changed — refresh position limits
+    requestAnimationFrame(updatePositionSliderLimits);
 });
 searchXInput.addEventListener("input", function() {
     docStyle.setProperty("--search-x", `${this.value}px`);
 });
 searchXInput.addEventListener("change", function() {
-    localStorage.setItem(STORAGE_KEYS.SEARCH_X, this.value);
+    localStorage.setItem(STORAGE_KEYS.SEARCH_X, String(Number(this.value) / window.innerWidth));
+    markUserTheme();
 });
 searchYInput.addEventListener("input", function() {
     docStyle.setProperty("--search-y", `${this.value}px`);
 });
 searchYInput.addEventListener("change", function() {
-    localStorage.setItem(STORAGE_KEYS.SEARCH_Y, this.value);
+    localStorage.setItem(STORAGE_KEYS.SEARCH_Y, String(Number(this.value) / window.innerHeight));
+    markUserTheme();
 });
 
 // Background Controls
@@ -993,3 +1104,6 @@ restoreDefaultsBtn.addEventListener("click", function() {
 
 // Sync cap select disabled state on load (settings.js runs after defaults.js)
 syncBgCapSelectState();
+
+// Set dynamic position slider limits after the initial layout is painted
+requestAnimationFrame(updatePositionSliderLimits);

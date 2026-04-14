@@ -14,6 +14,9 @@
   "fontFamily": "\"Ma Shan Zheng\", cursive",
   "bgBrightness": "-59",
   "bgImageEnabled": true,
+  "favoritesEnabled": true,
+  "clockHidden": false,
+  "dateHidden": false,
   "tabName": "Entertain me!",
   "favicon": ""
 }

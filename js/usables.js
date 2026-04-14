@@ -51,6 +51,7 @@ var STORAGE_KEYS = {
     SEARCH_URL: "ch_search_url",
     CLOCK_HIDDEN: "ch_clock_hidden",
     DATE_HIDDEN: "ch_date_hidden",
+    POS_FORMAT: "ch_pos_format",
 };
 
 // --- Cached DOM References ---
@@ -385,17 +386,59 @@ function applyBgFileSizeCapSetting() {
     document.getElementById("bg-file-size-cap").value = String(capped);
 }
 
+// --- Viewport-fraction position helpers ---
+
+/**
+ * Converts a stored viewport fraction to a pixel offset for the current window.
+ * Returns 0 for any non-finite input.
+ */
+function fracToPx(fracStr, dim) {
+    var frac = Number(fracStr);
+    return Number.isFinite(frac) ? Math.round(frac * dim) : 0;
+}
+
+/**
+ * One-time migration: converts legacy absolute-pixel position values to viewport
+ * fractions so they stay proportional across window resizes.
+ * A value is treated as a legacy pixel offset if it is an integer with abs >= 2.
+ * Runs once and marks ch_pos_format = "frac" so it is never repeated.
+ */
+function migratePositionsToFrac() {
+    if (localStorage.getItem(STORAGE_KEYS.POS_FORMAT) === "frac") return;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var pairs = [
+        { key: STORAGE_KEYS.CLOCK_X,  dim: vw },
+        { key: STORAGE_KEYS.CLOCK_Y,  dim: vh },
+        { key: STORAGE_KEYS.SEARCH_X, dim: vw },
+        { key: STORAGE_KEYS.SEARCH_Y, dim: vh },
+    ];
+    pairs.forEach(function(item) {
+        var raw = localStorage.getItem(item.key);
+        if (raw === null) return;
+        var val = Number(raw);
+        if (!Number.isFinite(val)) return;
+        // Legacy pixel values are integers with abs >= 2; convert them to fractions.
+        if (Number.isInteger(val) && Math.abs(val) >= 2) {
+            localStorage.setItem(item.key, String(val / item.dim));
+        }
+    });
+    localStorage.setItem(STORAGE_KEYS.POS_FORMAT, "frac");
+}
+
 function applyClockSettings() {
     var clockSize = localStorage.getItem(STORAGE_KEYS.CLOCK_SIZE) || DEFAULTS.CLOCK_SIZE;
-    var clockX = localStorage.getItem(STORAGE_KEYS.CLOCK_X) || DEFAULTS.CLOCK_X;
-    var clockY = localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || DEFAULTS.CLOCK_Y;
+    var clockXFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_X) || DEFAULTS.CLOCK_X;
+    var clockYFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || DEFAULTS.CLOCK_Y;
+    var clockXPx = fracToPx(clockXFrac, window.innerWidth);
+    var clockYPx = fracToPx(clockYFrac, window.innerHeight);
 
     document.getElementById("clock-size").value = clockSize;
-    document.getElementById("clock-x").value = clockX;
-    document.getElementById("clock-y").value = clockY;
+    document.getElementById("clock-x").value = clockXPx;
+    document.getElementById("clock-y").value = clockYPx;
     docStyle.setProperty("--clock-size", `${clockSize}rem`);
-    docStyle.setProperty("--clock-x", `${clockX}px`);
-    docStyle.setProperty("--clock-y", `${clockY}px`);
+    docStyle.setProperty("--clock-x", `${clockXPx}px`);
+    docStyle.setProperty("--clock-y", `${clockYPx}px`);
 }
 
 function applyClockVisibility() {
@@ -415,15 +458,17 @@ function applyClockVisibility() {
 
 function applySearchBarSettings() {
     var searchWidth = localStorage.getItem(STORAGE_KEYS.SEARCH_WIDTH) || DEFAULTS.SEARCH_WIDTH;
-    var searchX = Math.max(-150, Math.min(150, Number(localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X)));
-    var searchY = Math.max(-150, Math.min(150, Number(localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y)));
+    var searchXFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X;
+    var searchYFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y;
+    var searchXPx = fracToPx(searchXFrac, window.innerWidth);
+    var searchYPx = fracToPx(searchYFrac, window.innerHeight);
 
     document.getElementById("search-width").value = searchWidth;
-    document.getElementById("search-x").value = searchX;
-    document.getElementById("search-y").value = searchY;
+    document.getElementById("search-x").value = searchXPx;
+    document.getElementById("search-y").value = searchYPx;
     docStyle.setProperty("--search-width", `${searchWidth}px`);
-    docStyle.setProperty("--search-x", `${searchX}px`);
-    docStyle.setProperty("--search-y", `${searchY}px`);
+    docStyle.setProperty("--search-x", `${searchXPx}px`);
+    docStyle.setProperty("--search-y", `${searchYPx}px`);
 }
 
 function applyFontSettings() {
@@ -583,3 +628,7 @@ document.addEventListener("visibilitychange", function() {
 window.addEventListener("pagehide", function() {
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
 });
+
+// Migrate any legacy absolute-pixel position values to viewport fractions.
+// Must run after STORAGE_KEYS is defined and before apply functions consume stored positions.
+migratePositionsToFrac();
