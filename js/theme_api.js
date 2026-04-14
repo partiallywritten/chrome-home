@@ -37,34 +37,16 @@ function applyThemePreset(theme, themeId) {
         else localStorage.setItem(key, val);
     };
 
-    // Normalise a position value from theme.json to a viewport fraction.
-    // Theme files may use the legacy absolute-pixel format (integer, abs >= 2) or the
-    // newer fraction format. Anything that looks like a legacy pixel is converted.
-    function normPosX(val) {
-        if (val === null || val === undefined || val === "") return val;
-        var num = Number(val);
-        if (!Number.isFinite(num)) return val;
-        if (Number.isInteger(num) && Math.abs(num) >= 2) return String(num / window.innerWidth);
-        return String(num);
-    }
-    function normPosY(val) {
-        if (val === null || val === undefined || val === "") return val;
-        var num = Number(val);
-        if (!Number.isFinite(num)) return val;
-        if (Number.isInteger(num) && Math.abs(num) >= 2) return String(num / window.innerHeight);
-        return String(num);
-    }
-
     set(STORAGE_KEYS.BG_COLOR, theme.bgColor);
     set(STORAGE_KEYS.SURFACE_COLOR, theme.surfaceColor);
     set(STORAGE_KEYS.HIGHLIGHT_COLOR, theme.highlightColor);
     set(STORAGE_KEYS.TEXT_COLOR, theme.textColor);
     set(STORAGE_KEYS.CLOCK_SIZE, theme.clockSize);
-    set(STORAGE_KEYS.CLOCK_X, normPosX(theme.clockX));
-    set(STORAGE_KEYS.CLOCK_Y, normPosY(theme.clockY));
+    set(STORAGE_KEYS.CLOCK_X, theme.clockX);
+    set(STORAGE_KEYS.CLOCK_Y, theme.clockY);
     set(STORAGE_KEYS.SEARCH_WIDTH, theme.searchWidth);
-    set(STORAGE_KEYS.SEARCH_X, normPosX(theme.searchX));
-    set(STORAGE_KEYS.SEARCH_Y, normPosY(theme.searchY));
+    set(STORAGE_KEYS.SEARCH_X, theme.searchX);
+    set(STORAGE_KEYS.SEARCH_Y, theme.searchY);
     set(STORAGE_KEYS.FONT_URL, theme.fontUrl);
     set(STORAGE_KEYS.FONT_FAMILY, theme.fontFamily);
     set(STORAGE_KEYS.BG_BRIGHTNESS, theme.bgBrightness);

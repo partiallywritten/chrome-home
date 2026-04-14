@@ -128,7 +128,7 @@ The extension tracks the active configuration state via the `ch_theme` key in `l
 
 - Any change made through the settings panel sets `ch_theme` to `"user"`.
 - Selecting a theme from the theme browser sets `ch_theme` to the numeric theme ID string.
-- Confirming "Restore Defaults" removes `ch_theme` (returns to `null`), which re-applies theme 0 on the next page load.
+- Confirming "Restore Defaults" re-applies theme `0` and sets `ch_theme` to `"0"`.
 
 > **Note:** `ch_theme` is an internal implementation detail and is **not** a field in `theme.json`.
 
@@ -180,7 +180,7 @@ An empty string (`""`) for a string field clears/resets that setting.
 | `highlightColor` | CSS hex color    | `#be9da8` | Accent / highlight color used for interactive elements                      |
 | `textColor`      | CSS hex color    | `#eeb8b7` | Primary text color                                                          |
 | `clockSize`      | numeric string   | `"8"`     | Clock font size in `rem` units (range: `2`–`14`)                            |
-| `clockX`         | numeric string   | `"0"`     | Horizontal offset of the clock as a fraction of the viewport width (e.g. `"0.25"` = 25 % to the right of centre). Positive = right, negative = left. Legacy integer pixel values are automatically converted on import. |
+| `clockX`         | numeric string   | `"0"`     | Horizontal offset of the clock as a fraction of the viewport width (e.g. `"0.25"` = 25 % to the right of centre). Positive = right, negative = left. |
 | `clockY`         | numeric string   | `"0"`     | Vertical offset of the clock as a fraction of the viewport height. Positive = down, negative = up. |
 | `searchWidth`    | numeric string   | `"560"`   | Width of the search bar in pixels (range: `100`–`900`)                      |
 | `searchX`        | numeric string   | `"0"`     | Horizontal offset of the search bar as a fraction of the viewport width. Same sign convention as `clockX`. |
