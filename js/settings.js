@@ -764,13 +764,6 @@ function updatePositionSliderLimits() {
             clockYInput.value = clockYClamped;
             docStyle.setProperty("--clock-x", clockXClamped + "px");
             docStyle.setProperty("--clock-y", clockYClamped + "px");
-            // Persist the clamped fraction so the next resize starts from a valid baseline.
-            if (clockXClamped !== clockXIdeal) {
-                localStorage.setItem(STORAGE_KEYS.CLOCK_X, String(clockXClamped / vw));
-            }
-            if (clockYClamped !== clockYIdeal) {
-                localStorage.setItem(STORAGE_KEYS.CLOCK_Y, String(clockYClamped / vh));
-            }
         }
     }
 
@@ -812,13 +805,6 @@ function updatePositionSliderLimits() {
             searchYInput.value = searchYClamped;
             docStyle.setProperty("--search-x", searchXClamped + "px");
             docStyle.setProperty("--search-y", searchYClamped + "px");
-            // Persist the clamped fraction so the next resize starts from a valid baseline.
-            if (searchXClamped !== searchXIdeal) {
-                localStorage.setItem(STORAGE_KEYS.SEARCH_X, String(searchXClamped / vw));
-            }
-            if (searchYClamped !== searchYIdeal) {
-                localStorage.setItem(STORAGE_KEYS.SEARCH_Y, String(searchYClamped / vh));
-            }
         }
     }
 }
