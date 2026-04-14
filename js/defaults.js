@@ -34,4 +34,4 @@ applyFontSettings();
 applyGeneralSettings();
 applySearchSettings();
 renderFavorites();
-applyFavoritesEnabled();
+applyFavoritesSettings();

@@ -27,6 +27,10 @@ var bgFileSizeCapInput = document.getElementById("bg-file-size-cap");
 var bgImageToggle = document.getElementById("bg-image-toggle");
 
 var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
+var favoritesShowAddToggle = document.getElementById("favorites-show-add-toggle");
+var favoritesColumnToggle = document.getElementById("favorites-column-toggle");
+var favoritesXInput = document.getElementById("favorites-x");
+var favoritesYInput = document.getElementById("favorites-y");
 
 var clockSizeInput = document.getElementById("clock-size");
 var clockXInput = document.getElementById("clock-x");
@@ -807,6 +811,42 @@ function updatePositionSliderLimits() {
             docStyle.setProperty("--search-y", searchYClamped + "px");
         }
     }
+
+    // Favorites position limits
+    var favoritesSectionEl = document.getElementById("favorites-section");
+    if (favoritesSectionEl) {
+        var currentFavX = Number(favoritesXInput.value) || 0;
+        var currentFavY = Number(favoritesYInput.value) || 0;
+        var favRect = favoritesSectionEl.getBoundingClientRect();
+        if (favRect.width > 0 && favRect.height > 0) {
+            var favNatLeft   = favRect.left   - currentFavX;
+            var favNatRight  = favRect.right  - currentFavX;
+            var favNatTop    = favRect.top    - currentFavY;
+            var favNatBottom = favRect.bottom - currentFavY;
+
+            var favMaxX = Math.floor(vw - border - favNatRight);
+            var favMinX = Math.ceil(border - favNatLeft);
+            var favMaxY = Math.floor(vh - border - favNatBottom);
+            var favMinY = Math.ceil(border - favNatTop);
+
+            if (favMinX > favMaxX) { favMinX = 0; favMaxX = 0; }
+            if (favMinY > favMaxY) { favMinY = 0; favMaxY = 0; }
+
+            favoritesXInput.min = favMinX;
+            favoritesXInput.max = favMaxX;
+            favoritesYInput.min = favMinY;
+            favoritesYInput.max = favMaxY;
+
+            var favXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || 0, vw);
+            var favYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || 0, vh);
+            var favXClamped = Math.min(favMaxX, Math.max(favMinX, favXIdeal));
+            var favYClamped = Math.min(favMaxY, Math.max(favMinY, favYIdeal));
+            favoritesXInput.value = favXClamped;
+            favoritesYInput.value = favYClamped;
+            docStyle.setProperty("--favorites-x", favXClamped + "px");
+            docStyle.setProperty("--favorites-y", favYClamped + "px");
+        }
+    }
 }
 
 // Debounced resize handler so limits stay accurate when the window changes size
@@ -885,6 +925,34 @@ bgImageToggle.addEventListener("change", function() {
 favoritesEnabledToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.FAVORITES_ENABLED, this.checked ? "true" : "false");
     applyFavoritesEnabled();
+});
+
+favoritesShowAddToggle.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN, this.checked ? "true" : "false");
+    var btn = document.getElementById("add-btn");
+    if (btn) btn.classList.toggle("hidden", !this.checked);
+});
+
+favoritesColumnToggle.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_LAYOUT, this.checked ? "column" : "row");
+    var section = document.getElementById("favorites-section");
+    if (section) section.classList.toggle("favorites-column", this.checked);
+    requestAnimationFrame(updatePositionSliderLimits);
+});
+
+favoritesXInput.addEventListener("input", function() {
+    docStyle.setProperty("--favorites-x", `${this.value}px`);
+});
+favoritesXInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_X, String(Number(this.value) / window.innerWidth));
+    markUserTheme();
+});
+favoritesYInput.addEventListener("input", function() {
+    docStyle.setProperty("--favorites-y", `${this.value}px`);
+});
+favoritesYInput.addEventListener("change", function() {
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_Y, String(Number(this.value) / window.innerHeight));
+    markUserTheme();
 });
 
 bgBrightnessInput.addEventListener("input", function() {

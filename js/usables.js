@@ -27,6 +27,10 @@ var STORAGE_KEYS = {
     BG_FILE_SIZE_CAP: "ch_bg_file_size_cap",
     FAVORITES: "ch_favorites",
     FAVORITES_ENABLED: "ch_favorites_enabled",
+    FAVORITES_SHOW_ADD_BTN: "ch_favorites_show_add_btn",
+    FAVORITES_LAYOUT: "ch_favorites_layout",
+    FAVORITES_X: "ch_favorites_x",
+    FAVORITES_Y: "ch_favorites_y",
     BG_COLOR: "ch_bg_color",
     SURFACE_COLOR: "ch_surface_color",
     BG_IMAGE: "ch_bg_image",
@@ -518,6 +522,37 @@ function applyFavoritesEnabled() {
 
     if (favoritesToggle) favoritesToggle.checked = enabled;
     if (favoritesSection) favoritesSection.classList.toggle("hidden", !enabled);
+}
+
+function applyFavoritesSettings() {
+    applyFavoritesEnabled();
+
+    var addBtn = document.getElementById("add-btn");
+    var favoritesSection = document.getElementById("favorites-section");
+    var showAddToggle = document.getElementById("favorites-show-add-toggle");
+    var columnToggle = document.getElementById("favorites-column-toggle");
+
+    var showAdd = localStorage.getItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN) !== "false";
+    var isColumn = localStorage.getItem(STORAGE_KEYS.FAVORITES_LAYOUT) === "column";
+
+    var favXFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || "0";
+    var favYFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || "0";
+    var favXPx = fracToPx(favXFrac, window.innerWidth);
+    var favYPx = fracToPx(favYFrac, window.innerHeight);
+
+    if (showAddToggle) showAddToggle.checked = showAdd;
+    if (columnToggle) columnToggle.checked = isColumn;
+
+    if (addBtn) addBtn.classList.toggle("hidden", !showAdd);
+    if (favoritesSection) favoritesSection.classList.toggle("favorites-column", isColumn);
+
+    var favXInput = document.getElementById("favorites-x");
+    var favYInput = document.getElementById("favorites-y");
+    if (favXInput) favXInput.value = favXPx;
+    if (favYInput) favYInput.value = favYPx;
+
+    docStyle.setProperty("--favorites-x", favXPx + "px");
+    docStyle.setProperty("--favorites-y", favYPx + "px");
 }
 
 // --- Favorites ---
