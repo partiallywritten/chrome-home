@@ -145,12 +145,12 @@
               </div>
             </div>
             <div class="setting-group">
-              <div class="toggle-row">
-                <span class="setting-group-label">Column Layout</span>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="favorites-column-toggle" />
-                  <span class="toggle-slider"></span>
-                </label>
+              <div class="input-row">
+                <label for="favorites-layout-select" class="setting-inline-label">Layout</label>
+                <select id="favorites-layout-select" class="text-input">
+                  <option value="row">Row</option>
+                  <option value="column">Column</option>
+                </select>
               </div>
             </div>
             <div class="setting-group">
@@ -212,11 +212,11 @@
               </div>
             </div>
             <div class="setting-group">
-              <label for="bg-brightness">Image Brightness</label>
+              <label for="bg-brightness">Background Brightness</label>
               <input type="range" id="bg-brightness" min="-100" max="100" step="1" value="0" />
             </div>
             <div class="setting-group">
-              <label for="bg-image-cap">Image Quality Cap</label>
+              <label for="bg-image-cap">Background Quality Cap</label>
               <select id="bg-image-cap" class="text-input">
                 <option value="default">Default (no scaling)</option>
                 <option value="1080p">1080p (1920×1080)</option>
@@ -226,7 +226,7 @@
             </div>
             <div class="setting-group">
               <div class="input-row">
-                <label for="bg-file-size-cap" class="setting-inline-label">Max file size</label>
+                <label for="bg-file-size-cap" class="setting-inline-label">Max file size <span class="setting-hint">(max 250 MB)</span></label>
                 <input
                   type="number"
                   id="bg-file-size-cap"

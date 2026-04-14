@@ -530,10 +530,11 @@ function applyFavoritesSettings() {
     var addBtn = document.getElementById("add-btn");
     var favoritesSection = document.getElementById("favorites-section");
     var showAddToggle = document.getElementById("favorites-show-add-toggle");
-    var columnToggle = document.getElementById("favorites-column-toggle");
+    var layoutSelect = document.getElementById("favorites-layout-select");
 
     var showAdd = localStorage.getItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN) !== "false";
-    var isColumn = localStorage.getItem(STORAGE_KEYS.FAVORITES_LAYOUT) === "column";
+    var layout = localStorage.getItem(STORAGE_KEYS.FAVORITES_LAYOUT) || "row";
+    var isColumn = layout === "column";
 
     var favXFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || "0";
     var favYFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || "0";
@@ -541,7 +542,7 @@ function applyFavoritesSettings() {
     var favYPx = fracToPx(favYFrac, window.innerHeight);
 
     if (showAddToggle) showAddToggle.checked = showAdd;
-    if (columnToggle) columnToggle.checked = isColumn;
+    if (layoutSelect) layoutSelect.value = layout;
 
     if (addBtn) addBtn.classList.toggle("hidden", !showAdd);
     if (favoritesSection) favoritesSection.classList.toggle("favorites-column", isColumn);

@@ -419,7 +419,7 @@ body {
 .settings-update-notice {
   font-size: 0.78rem;
   font-weight: 500;
-  color: #d9163e;
+  color: var(--accent);
 }
 
 .settings-update-notice.hidden {
@@ -683,6 +683,15 @@ select.text-input option {
   letter-spacing: 0.09em;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.setting-hint {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.75;
 }
 
 .size-cap-input {

@@ -336,7 +336,8 @@ function removeCommunityThemesFromGrid() {
 }
 
 function applyThemesEnabledSetting() {
-    var enabled = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED) === "true";
+    var stored = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED);
+    var enabled = stored === null ? true : stored === "true";
     themesEnabledToggle.checked = enabled;
     browseThemesBtn.classList.toggle("hidden", !enabled);
 }

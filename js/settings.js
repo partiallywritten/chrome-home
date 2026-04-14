@@ -28,7 +28,7 @@ var bgImageToggle = document.getElementById("bg-image-toggle");
 
 var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
 var favoritesShowAddToggle = document.getElementById("favorites-show-add-toggle");
-var favoritesColumnToggle = document.getElementById("favorites-column-toggle");
+var favoritesLayoutSelect = document.getElementById("favorites-layout-select");
 var favoritesXInput = document.getElementById("favorites-x");
 var favoritesYInput = document.getElementById("favorites-y");
 
@@ -951,10 +951,11 @@ favoritesShowAddToggle.addEventListener("change", function() {
     if (btn) btn.classList.toggle("hidden", !this.checked);
 });
 
-favoritesColumnToggle.addEventListener("change", function() {
-    localStorage.setItem(STORAGE_KEYS.FAVORITES_LAYOUT, this.checked ? "column" : "row");
+favoritesLayoutSelect.addEventListener("change", function() {
+    var isColumn = this.value === "column";
+    localStorage.setItem(STORAGE_KEYS.FAVORITES_LAYOUT, this.value);
     var section = document.getElementById("favorites-section");
-    if (section) section.classList.toggle("favorites-column", this.checked);
+    if (section) section.classList.toggle("favorites-column", isColumn);
     requestAnimationFrame(updatePositionSliderLimits);
 });
 
