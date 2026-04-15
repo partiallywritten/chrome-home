@@ -115,7 +115,12 @@ function compressImage(dataUrl, maxWidth, maxHeight, quality, callback) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
-        callback(canvas.toDataURL("image/jpeg", quality));
+        var result = canvas.toDataURL("image/jpeg", quality);
+        // Release the canvas backing store immediately rather than waiting for GC.
+        // A 1080p canvas holds ~8 MB of pixel data that Chrome otherwise retains
+        // until the next GC cycle.
+        canvas.width = 0;
+        callback(result);
     };
     img.onerror = function() {
         callback(dataUrl);
