@@ -55,7 +55,6 @@ var STORAGE_KEYS = {
     SEARCH_URL: "ch_search_url",
     CLOCK_HIDDEN: "ch_clock_hidden",
     DATE_HIDDEN: "ch_date_hidden",
-    POS_FORMAT: "ch_pos_format",
 };
 
 // --- Cached DOM References ---
@@ -149,16 +148,6 @@ function _getBgFromChromeStorage(callback) {
             callback(stored);
             return;
         }
-        var legacy = localStorage.getItem(STORAGE_KEYS.BG_IMAGE);
-        if (legacy) {
-            var obj = {};
-            obj[STORAGE_KEYS.BG_IMAGE] = legacy;
-            chrome.storage.local.set(obj, function() {
-                localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
-            });
-            callback(legacy);
-            return;
-        }
         callback("");
     });
 }
@@ -188,7 +177,6 @@ function getBgImage(callback) {
 }
 
 function saveBgImage(value, callback) {
-    localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
     var cb = callback || function() {};
     if (!value) {
         if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
@@ -225,7 +213,6 @@ function saveBgImage(value, callback) {
 // chrome.storage.local. BG_IMAGE_TYPE tracks what kind of background is active;
 // the actual data lives in IDB (read back via getBgImage → createObjectURL).
 function _saveBlobToIdb(blob, mediaType, callback) {
-    localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, mediaType);
     var cb = callback || function() {};
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
@@ -399,35 +386,6 @@ function applyBgFileSizeCapSetting() {
 function fracToPx(fracStr, dim) {
     var frac = Number(fracStr);
     return Number.isFinite(frac) ? Math.round(frac * dim) : 0;
-}
-
-/**
- * One-time migration: converts legacy absolute-pixel position values to viewport
- * fractions so they stay proportional across window resizes.
- * A value is treated as a legacy pixel offset if it is an integer with abs >= 2.
- * Runs once and marks ch_pos_format = "frac" so it is never repeated.
- */
-function migratePositionsToFrac() {
-    if (localStorage.getItem(STORAGE_KEYS.POS_FORMAT) === "frac") return;
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-    var pairs = [
-        { key: STORAGE_KEYS.CLOCK_X,  dim: vw },
-        { key: STORAGE_KEYS.CLOCK_Y,  dim: vh },
-        { key: STORAGE_KEYS.SEARCH_X, dim: vw },
-        { key: STORAGE_KEYS.SEARCH_Y, dim: vh },
-    ];
-    pairs.forEach(function(item) {
-        var raw = localStorage.getItem(item.key);
-        if (raw === null) return;
-        var val = Number(raw);
-        if (!Number.isFinite(val)) return;
-        // Legacy pixel values are integers with abs >= 2; convert them to fractions.
-        if (Number.isInteger(val) && Math.abs(val) >= 2) {
-            localStorage.setItem(item.key, String(val / item.dim));
-        }
-    });
-    localStorage.setItem(STORAGE_KEYS.POS_FORMAT, "frac");
 }
 
 function applyClockSettings() {
@@ -664,7 +622,3 @@ document.addEventListener("visibilitychange", function() {
 window.addEventListener("pagehide", function() {
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
 });
-
-// Migrate any legacy absolute-pixel position values to viewport fractions.
-// Must run after STORAGE_KEYS is defined and before apply functions consume stored positions.
-migratePositionsToFrac();
