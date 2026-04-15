@@ -1026,6 +1026,7 @@ applyBgBtn.addEventListener("click", function() {
         markUserTheme();
         saveBgImage(safeUrl);
         setBodyBgImage(safeUrl);
+        syncBgCapSelectState();
     });
 });
 
