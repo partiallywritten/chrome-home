@@ -382,6 +382,20 @@ body {
   gap: 0.5rem;
 }
 
+.settings-header__socials {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-header__sep {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0.5;
+  user-select: none;
+}
+
 .settings-header h2 {
   font-size: 1.02rem;
   font-weight: 500;

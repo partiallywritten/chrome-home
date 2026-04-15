@@ -25,6 +25,7 @@ themes/
     0/
       theme.json         ← Default theme settings (id 0)
       background.jpg     ← Default theme background image (or background.webp)
+      preview.webp       ← (optional) thumbnail shown in the theme browser
     1/
       theme.json
       background.jpg
@@ -33,6 +34,7 @@ themes/
     nnt-forest/
       theme.json         ← Community theme (id "nnt-forest")
       background.webp    ← Preferred format; background.jpg is also accepted
+      preview.webp       ← (optional) thumbnail shown in the theme browser
     ...
 ```
 
@@ -45,14 +47,15 @@ Themes are identified by their `id`. The id determines both the folder name and 
 
 ### Adding an Included theme (numeric id)
 1. Create a new numbered folder (e.g. `themes/included/6/`).
-2. Add a `background.webp` (or `background.jpg`) — the background image for the theme.
-3. Add a `theme.json` — see schema below.
-4. Register the theme in `themes/included_themes.json` by appending `{ "id": 6, "name": "My Theme" }`.
+2. Add a `background.webp` (or `background.jpg`) — the background image for the theme. For animated themes, add `background.webm` (or `background.mp4`) instead and set `"animated": true` in `theme.json`.
+3. Optionally add a `preview.webp` — a static thumbnail for the theme browser. If omitted, the browser falls back to `background.webp` / `background.jpg`.
+4. Add a `theme.json` — see schema below.
+5. Register the theme in `themes/included_themes.json` by appending `{ "id": 6, "name": "My Theme" }`.
 
 ### Adding a Community theme (nnt- id)
 1. Choose a unique slug, e.g. `dark-ocean`. The full id will be `"nnt-dark-ocean"`.
 2. Create the folder `themes/community/nnt-dark-ocean/`.
-3. Add a `background.webp` (or `background.jpg`) and a `theme.json`.
+3. Add a `background.webp` (or `background.jpg`) and a `theme.json`. For animated themes, add `background.webm` (or `background.mp4`) instead and set `"animated": true` in `theme.json`. Optionally add a `preview.webp` static thumbnail.
 4. Register the theme in `themes/community_themes.json` by appending `{ "id": "nnt-dark-ocean", "name": "Dark Ocean" }`.
 5. Enable the **Enable Community Themes** toggle inside the theme browser. The theme will appear in the **Community** section.
 
@@ -161,6 +164,7 @@ An empty string (`""`) for a string field clears/resets that setting.
 
   "bgBrightness": "0",
   "bgImageEnabled": true,
+  "animated": false,
 
   "favoritesEnabled": true,
   "favoritesShowAddBtn": true,
@@ -194,6 +198,7 @@ An empty string (`""`) for a string field clears/resets that setting.
 | `fontFamily`     | CSS font stack   | monospace stack | CSS `font-family` value applied to the whole page                    |
 | `bgBrightness`   | numeric string   | `"0"`     | Background brightness adjustment (range: `-100`–`100`)                      |
 | `bgImageEnabled` | boolean          | `true`    | Whether the background image is shown (`true`) or hidden (`false`)          |
+| `animated`       | boolean          | `false`   | When `true`, the theme uses an animated video background (`background.webm` preferred, `background.mp4` as fallback). The quality cap is automatically forced to **Default (no scaling)** for animated themes. |
 | `favoritesEnabled` | boolean        | `true`    | Whether the favorites section is shown (`true`) or hidden (`false`)         |
 | `favoritesShowAddBtn` | boolean     | `true`    | Whether the [+] add-favorite button is shown (`true`) or hidden (`false`)   |
 | `favoritesLayout` | string          | `"row"`   | Layout of the favorites grid: `"row"` (default, wrapping rows) or `"column"` (vertical stack) |
@@ -204,7 +209,7 @@ An empty string (`""`) for a string field clears/resets that setting.
 | `tabName`        | string           | `""`      | Browser tab title. `""` = shows `"New Tab"`                                 |
 | `favicon`        | URL string       | `""`      | URL of a custom favicon image. `""` = browser default                       |
 
-> **Not in API:** `bgImageCap` is a user-only preference (set in the Background settings panel). It is intentionally excluded from `theme.json` so themes always respect the user's chosen image quality cap.
+> **Not in API:** `bgImageCap` is a user-only preference (set in the Background settings panel). It is intentionally excluded from `theme.json` so themes always respect the user's chosen image quality cap — except when `animated: true` forces it to **Default** automatically.
 
 ### Background image (`background.webp` / `background.jpg`)
 The theme's background image must be placed inside the theme folder.  
@@ -215,4 +220,13 @@ JPEG is supported as a fallback for older themes — name the file `background.j
 When both files exist in the same theme folder, `background.webp` takes precedence.
 
 Recommended size is 1920×1080 or larger.
+
+### Animated background (`background.webm` / `background.mp4`)
+Set `"animated": true` in `theme.json` to use a looping video as the background.  
+The extension looks for `background.webm` first; if not found it falls back to `background.mp4`.  
+When `animated` is `true` the quality cap is automatically set to **Default (no scaling)**.
+
+### Preview thumbnail (`preview.webp`)
+Place a `preview.webp` file inside the theme folder to display a custom static thumbnail in the theme browser. If `preview.webp` is absent, the browser falls back to `background.webp` then `background.jpg`.  
+This is especially useful for animated themes where a static thumbnail is more appropriate than a video poster frame.
 

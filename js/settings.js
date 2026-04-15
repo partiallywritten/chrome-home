@@ -65,6 +65,7 @@ var applyFaviconBtn = document.getElementById("apply-favicon");
 var clearFaviconBtn = document.getElementById("clear-favicon");
 var restoreDefaultsBtn = document.getElementById("restore-defaults");
 var exportThemeBtn = document.getElementById("export-theme-btn");
+var exportSep = document.getElementById("export-sep");
 var settingsBranding = document.getElementById("settings-branding");
 var settingsVersionEl = document.getElementById("settings-version");
 var updateNotice = document.getElementById("update-notice");
@@ -459,7 +460,9 @@ function dataUrlToBytes(dataUrl) {
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    exportThemeBtn.classList.toggle("hidden", localStorage.getItem(STORAGE_KEYS.THEME) !== "user");
+    var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
+    exportThemeBtn.classList.toggle("hidden", !isUser);
+    exportSep.classList.toggle("hidden", !isUser);
 }
 
 function markUserTheme() {
