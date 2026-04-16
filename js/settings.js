@@ -484,6 +484,7 @@ function exportUserTheme() {
         fontFamily: localStorage.getItem(STORAGE_KEYS.FONT_FAMILY) || DEFAULTS.FONT_FAMILY,
         bgBrightness: localStorage.getItem(STORAGE_KEYS.BG_BRIGHTNESS) || "0",
         bgImageEnabled: localStorage.getItem(STORAGE_KEYS.BG_IMAGE_ENABLED) !== "false",
+        animated: localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video",
         tabName: localStorage.getItem(STORAGE_KEYS.TAB_NAME) || "",
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
