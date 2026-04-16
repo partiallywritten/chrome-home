@@ -65,6 +65,7 @@ var applyFaviconBtn = document.getElementById("apply-favicon");
 var clearFaviconBtn = document.getElementById("clear-favicon");
 var restoreDefaultsBtn = document.getElementById("restore-defaults");
 var exportThemeBtn = document.getElementById("export-theme-btn");
+var exportSep = document.getElementById("export-sep");
 var settingsBranding = document.getElementById("settings-branding");
 var settingsVersionEl = document.getElementById("settings-version");
 var updateNotice = document.getElementById("update-notice");
@@ -459,7 +460,9 @@ function dataUrlToBytes(dataUrl) {
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    exportThemeBtn.classList.toggle("hidden", localStorage.getItem(STORAGE_KEYS.THEME) !== "user");
+    var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
+    exportThemeBtn.classList.toggle("hidden", !isUser);
+    exportSep.classList.toggle("hidden", !isUser);
 }
 
 function markUserTheme() {
@@ -481,6 +484,7 @@ function exportUserTheme() {
         fontFamily: localStorage.getItem(STORAGE_KEYS.FONT_FAMILY) || DEFAULTS.FONT_FAMILY,
         bgBrightness: localStorage.getItem(STORAGE_KEYS.BG_BRIGHTNESS) || "0",
         bgImageEnabled: localStorage.getItem(STORAGE_KEYS.BG_IMAGE_ENABLED) !== "false",
+        animated: localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video",
         tabName: localStorage.getItem(STORAGE_KEYS.TAB_NAME) || "",
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };

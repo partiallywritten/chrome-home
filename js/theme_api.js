@@ -98,6 +98,33 @@ function applyThemePreset(theme, themeId) {
     // Fetch the theme background image, process through canvas (respecting cap), save as data URL
     if (!bgEnabled) {
         saveBgImage("", function() { applyBackground(); });
+    } else if (theme.animated === true) {
+        // Animated background: force quality cap to default, fetch webm/mp4, save as video
+        forceBgCapToDefault();
+        syncBgCapSelectState();
+        var themeFolder = getThemeFolder(String(themeId));
+        fetch(themeFolder + "/background.webm")
+            .then(function(r) {
+                if (!r.ok) throw new Error("WebM not found");
+                return r.blob();
+            })
+            .catch(function() {
+                return fetch(themeFolder + "/background.mp4").then(function(r) {
+                    if (!r.ok) throw new Error("MP4 not found");
+                    return r.blob();
+                });
+            })
+            .then(function(blob) {
+                saveBgVideo(blob, function() {
+                    getBgImage(function(blobUrl) {
+                        if (blobUrl) setBodyBgVideo(blobUrl);
+                        else applyBackground();
+                    });
+                });
+            })
+            .catch(function() {
+                applyBackground();
+            });
     } else {
         var themeFolder = getThemeFolder(String(themeId));
         fetch(themeFolder + "/background.webp")
@@ -157,10 +184,14 @@ function createThemeCard(idStr, name, isActive) {
     var thumb = document.createElement("div");
     thumb.className = "theme-card__thumb";
     var img = document.createElement("img");
-    img.src = getThemeFolder(idStr) + "/background.webp";
+    img.src = getThemeFolder(idStr) + "/preview.webp";
     img.onerror = function() {
         img.onerror = null;
-        img.src = getThemeFolder(idStr) + "/background.jpg";
+        img.onerror = function() {
+            img.onerror = null;
+            img.src = getThemeFolder(idStr) + "/background.jpg";
+        };
+        img.src = getThemeFolder(idStr) + "/background.webp";
     };
     img.alt = "";
     img.className = "theme-card__img";
