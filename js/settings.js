@@ -65,7 +65,8 @@ var applyFaviconBtn = document.getElementById("apply-favicon");
 var clearFaviconBtn = document.getElementById("clear-favicon");
 var restoreDefaultsBtn = document.getElementById("restore-defaults");
 var exportThemeBtn = document.getElementById("export-theme-btn");
-var exportSep = document.getElementById("export-sep");
+var importThemeBtn = document.getElementById("import-theme-btn");
+var importThemeFile = document.getElementById("import-theme-file");
 var settingsBranding = document.getElementById("settings-branding");
 var settingsVersionEl = document.getElementById("settings-version");
 var updateNotice = document.getElementById("update-notice");
@@ -462,7 +463,6 @@ function dataUrlToBytes(dataUrl) {
 function syncExportBtnVisibility() {
     var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
     exportThemeBtn.classList.toggle("hidden", !isUser);
-    exportSep.classList.toggle("hidden", !isUser);
 }
 
 function markUserTheme() {
@@ -558,6 +558,105 @@ function exportUserTheme() {
     });
 }
 
+// --- Import Theme ---
+
+function parseZipEntries(bytes) {
+    var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var entries = [];
+    var i = 0;
+    while (i < bytes.length - 4) {
+        if (view.getUint32(i, true) !== 0x04034b50) break;
+        var flags = view.getUint16(i + 6, true);
+        var nameLen = view.getUint16(i + 26, true);
+        var extraLen = view.getUint16(i + 28, true);
+        var compSize = view.getUint32(i + 18, true);
+        var name = new TextDecoder().decode(bytes.subarray(i + 30, i + 30 + nameLen));
+        var dataStart = i + 30 + nameLen + extraLen;
+        var data = bytes.subarray(dataStart, dataStart + compSize);
+        entries.push({ name: name, data: data, flags: flags });
+        i = dataStart + compSize;
+    }
+    return entries;
+}
+
+function importThemeFromZip(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var bytes = new Uint8Array(e.target.result);
+        var entries = parseZipEntries(bytes);
+
+        var themeEntry = null;
+        var bgEntry = null;
+        entries.forEach(function(entry) {
+            if (/\/theme\.json$/.test(entry.name) || entry.name === "theme.json") {
+                themeEntry = entry;
+            } else if (/\/(background\.(webp|jpg|jpeg|webm|mp4))$/.test(entry.name) || /^background\.(webp|jpg|jpeg|webm|mp4)$/.test(entry.name)) {
+                bgEntry = entry;
+            }
+        });
+
+        if (!themeEntry) return;
+
+        var themeJson;
+        try {
+            themeJson = JSON.parse(new TextDecoder().decode(themeEntry.data));
+        } catch (err) {
+            return;
+        }
+
+        // Derive the theme id from the zip filename or from theme.json
+        var themeId = "user";
+        var zipName = file.name.replace(/\.zip$/i, "");
+        if (/^nnt-/.test(zipName)) {
+            themeId = zipName;
+        }
+
+        // Apply theme settings; skip background fetching from folder since we supply it from the zip
+        var themeForApply = Object.assign({}, themeJson, { bgImageEnabled: bgEntry ? false : themeJson.bgImageEnabled });
+        applyThemePreset(themeForApply, themeId);
+
+        if (bgEntry) {
+            // Enable background image since one was supplied in the zip
+            localStorage.setItem(STORAGE_KEYS.BG_IMAGE_ENABLED, "true");
+            var bgName = bgEntry.name.split("/").pop();
+            var isVideo = /\.(webm|mp4)$/.test(bgName);
+            var mimeMap = { "webp": "image/webp", "jpg": "image/jpeg", "jpeg": "image/jpeg", "mp4": "video/mp4", "webm": "video/webm" };
+            var ext = bgName.split(".").pop().toLowerCase();
+            var mime = mimeMap[ext] || "image/jpeg";
+            var blob = new Blob([bgEntry.data], { type: mime });
+            if (isVideo) {
+                saveBgVideo(blob, function() {
+                    getBgImage(function(blobUrl) {
+                        if (blobUrl) setBodyBgVideo(blobUrl);
+                        else applyBackground();
+                    });
+                });
+            } else {
+                var dims = getBgImageCapDimensions();
+                if (!dims) {
+                    saveBgImageBlob(blob, function() {
+                        getBgImage(function(url) {
+                            if (url) setBodyBgImage(url);
+                            else applyBackground();
+                        });
+                    });
+                } else {
+                    var objUrl = URL.createObjectURL(blob);
+                    compressImage(objUrl, dims.width, dims.height, 0.8, function(compressed) {
+                        URL.revokeObjectURL(objUrl);
+                        setBodyBgImage(compressed);
+                        saveBgImage(compressed);
+                    });
+                }
+            }
+        }
+
+        syncExportBtnVisibility();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
 function openSettings() {
     settingsPanel.classList.add("open");
     settingsPanel.setAttribute("aria-hidden", "false");
@@ -626,6 +725,14 @@ closeSettingsBtn.addEventListener("click", closeSettingsPanel);
 addBtn.addEventListener("click", openModal);
 modalCancel.addEventListener("click", closeModal);
 exportThemeBtn.addEventListener("click", exportUserTheme);
+importThemeBtn.addEventListener("click", function() { importThemeFile.click(); });
+importThemeFile.addEventListener("change", function() {
+    var file = this.files && this.files[0];
+    if (file) {
+        importThemeFromZip(file);
+        this.value = "";
+    }
+});
 
 modalOverlay.addEventListener("click", function(e) {
     if (e.target === modalOverlay) closeModal();
