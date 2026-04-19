@@ -14,6 +14,7 @@
   "fontFamily": "\"Silkscreen\", sans-serif",
   "bgBrightness": "-60",
   "bgImageEnabled": true,
+  "animated": false,
   "favoritesEnabled": true,
   "clockHidden": false,
   "dateHidden": false,
