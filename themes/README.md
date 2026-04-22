@@ -2,7 +2,7 @@
 This folder contains pre-made themes for the Nozy-NT extension and documents the full theming API.
 
 ## Word before diving in
-For most (if not all) people, this spec is pretty useless except [folder structure](#folder-structure) & [installing theme](#adding-a-new-theme) sections. If you want to make a theme, just go to the settings panel → customize it to your liking → export it (click the little download icon next to the extension name). The UI is pretty explanatory.
+For most (if not all) people, this spec is pretty useless except [folder structure](#folder-structure) & [installing theme](#adding-a-new-theme) sections. If you want to make a theme, just go to the settings panel → customize it to your liking → export it (click the download icon in the settings header). To use someone else's theme, click the upload icon next to it to import a zip. The UI is pretty explanatory.
 
 ## Table of contents
 1. [Folder structure](#folder-structure)
@@ -127,10 +127,12 @@ The extension tracks the active configuration state via the `ch_theme` key in `l
 |-------------------|-------------------------------------------------------------------|
 | `null` (absent)   | Fresh install — theme `0` is applied and persisted               |
 | `"user"`          | User has manually customised one or more settings                 |
-| `"0"`, `"1"`, …   | A named theme from the theme browser is active                   |
+| `"0"`, `"1"`, …   | A bundled included theme from the theme browser is active         |
+| `"nnt-*"`         | A community theme (or an imported zip with an `nnt-` filename) is active |
 
 - Any change made through the settings panel sets `ch_theme` to `"user"`.
-- Selecting a theme from the theme browser sets `ch_theme` to the numeric theme ID string.
+- Selecting a theme from the theme browser sets `ch_theme` to the theme's ID string (`"0"`, `"1"`, `"nnt-*"`, etc.).
+- Importing a zip whose filename starts with `nnt-` sets `ch_theme` to that `nnt-*` id; otherwise it sets it to `"user"`.
 - Confirming "Restore Defaults" re-applies theme `0` and sets `ch_theme` to `"0"`.
 
 > **Note:** `ch_theme` is an internal implementation detail and is **not** a field in `theme.json`.
