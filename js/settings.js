@@ -1,130 +1,130 @@
 "use strict";
 
 // --- DOM Elements ---
-var addBtn = document.getElementById("add-btn");
-var settingsBtn = document.getElementById("settings-btn");
-var settingsPanel = document.getElementById("settings-panel");
-var closeSettingsBtn = document.getElementById("close-settings");
-var settingsSections = settingsPanel.querySelectorAll("details.settings-section");
+const addBtn = document.getElementById("add-btn");
+const settingsBtn = document.getElementById("settings-btn");
+const settingsPanel = document.getElementById("settings-panel");
+const closeSettingsBtn = document.getElementById("close-settings");
+const settingsSections = settingsPanel.querySelectorAll("details.settings-section");
 
-var bgColorInput = document.getElementById("bg-color");
-var bgColorHexInput = document.getElementById("bg-color-hex");
-var surfaceColorInput = document.getElementById("surface-color");
-var surfaceColorHexInput = document.getElementById("surface-color-hex");
-var highlightColorInput = document.getElementById("highlight-color");
-var highlightColorHexInput = document.getElementById("highlight-color-hex");
-var textColorInput = document.getElementById("text-color");
-var textColorHexInput = document.getElementById("text-color-hex");
+const bgColorInput = document.getElementById("bg-color");
+const bgColorHexInput = document.getElementById("bg-color-hex");
+const surfaceColorInput = document.getElementById("surface-color");
+const surfaceColorHexInput = document.getElementById("surface-color-hex");
+const highlightColorInput = document.getElementById("highlight-color");
+const highlightColorHexInput = document.getElementById("highlight-color-hex");
+const textColorInput = document.getElementById("text-color");
+const textColorHexInput = document.getElementById("text-color-hex");
 
-var bgImageInput = document.getElementById("bg-image");
-var bgFileInput = document.getElementById("bg-file");
-var bgImageError = document.getElementById("bg-image-error");
-var applyBgBtn = document.getElementById("apply-bg");
-var clearBgBtn = document.getElementById("clear-bg");
-var bgBrightnessInput = document.getElementById("bg-brightness");
-var bgImageCapSelect = document.getElementById("bg-image-cap");
-var bgFileSizeCapInput = document.getElementById("bg-file-size-cap");
-var bgImageToggle = document.getElementById("bg-image-toggle");
+const bgImageInput = document.getElementById("bg-image");
+const bgFileInput = document.getElementById("bg-file");
+const bgImageError = document.getElementById("bg-image-error");
+const applyBgBtn = document.getElementById("apply-bg");
+const clearBgBtn = document.getElementById("clear-bg");
+const bgBrightnessInput = document.getElementById("bg-brightness");
+const bgImageCapSelect = document.getElementById("bg-image-cap");
+const bgFileSizeCapInput = document.getElementById("bg-file-size-cap");
+const bgImageToggle = document.getElementById("bg-image-toggle");
 
-var favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
-var favoritesShowAddToggle = document.getElementById("favorites-show-add-toggle");
-var favoritesLayoutSelect = document.getElementById("favorites-layout-select");
-var favoritesXInput = document.getElementById("favorites-x");
-var favoritesYInput = document.getElementById("favorites-y");
+const favoritesEnabledToggle = document.getElementById("favorites-enabled-toggle");
+const favoritesShowAddToggle = document.getElementById("favorites-show-add-toggle");
+const favoritesLayoutSelect = document.getElementById("favorites-layout-select");
+const favoritesXInput = document.getElementById("favorites-x");
+const favoritesYInput = document.getElementById("favorites-y");
 
-var clockSizeInput = document.getElementById("clock-size");
-var clockXInput = document.getElementById("clock-x");
-var clockYInput = document.getElementById("clock-y");
-var clockHiddenToggle = document.getElementById("clock-hidden-toggle");
-var dateHiddenToggle = document.getElementById("date-hidden-toggle");
+const clockSizeInput = document.getElementById("clock-size");
+const clockXInput = document.getElementById("clock-x");
+const clockYInput = document.getElementById("clock-y");
+const clockHiddenToggle = document.getElementById("clock-hidden-toggle");
+const dateHiddenToggle = document.getElementById("date-hidden-toggle");
 
-var searchWidthInput = document.getElementById("search-width");
-var searchXInput = document.getElementById("search-x");
-var searchYInput = document.getElementById("search-y");
+const searchWidthInput = document.getElementById("search-width");
+const searchXInput = document.getElementById("search-x");
+const searchYInput = document.getElementById("search-y");
 
-var fontUrlInput = document.getElementById("font-url");
-var fontUrlError = document.getElementById("font-url-error");
-var fontFamilyInput = document.getElementById("font-family");
-var applyFontBtn = document.getElementById("apply-font");
+const fontUrlInput = document.getElementById("font-url");
+const fontUrlError = document.getElementById("font-url-error");
+const fontFamilyInput = document.getElementById("font-family");
+const applyFontBtn = document.getElementById("apply-font");
 
-var modalOverlay = document.getElementById("modal-overlay");
-var modalTitle = document.getElementById("modal-title");
-var favNameInput = document.getElementById("fav-name");
-var favNameError = document.getElementById("fav-name-error");
-var favUrlInput = document.getElementById("fav-url");
-var favUrlError = document.getElementById("fav-url-error");
-var modalCancel = document.getElementById("modal-cancel");
-var modalSave = document.getElementById("modal-save");
+const modalOverlay = document.getElementById("modal-overlay");
+const modalTitle = document.getElementById("modal-title");
+const favNameInput = document.getElementById("fav-name");
+const favNameError = document.getElementById("fav-name-error");
+const favUrlInput = document.getElementById("fav-url");
+const favUrlError = document.getElementById("fav-url-error");
+const modalCancel = document.getElementById("modal-cancel");
+const modalSave = document.getElementById("modal-save");
 
-var tabNameInput = document.getElementById("tab-name");
-var applyTabNameBtn = document.getElementById("apply-tab-name");
-var faviconUrlInput = document.getElementById("favicon-url");
-var faviconUrlError = document.getElementById("favicon-url-error");
-var faviconFileInput = document.getElementById("favicon-file");
-var applyFaviconBtn = document.getElementById("apply-favicon");
-var clearFaviconBtn = document.getElementById("clear-favicon");
-var restoreDefaultsBtn = document.getElementById("restore-defaults");
-var exportThemeBtn = document.getElementById("export-theme-btn");
-var importThemeBtn = document.getElementById("import-theme-btn");
-var importThemeFile = document.getElementById("import-theme-file");
-var settingsBranding = document.getElementById("settings-branding");
-var settingsVersionEl = document.getElementById("settings-version");
-var updateNotice = document.getElementById("update-notice");
-var updateVersionEl = document.getElementById("update-version");
+const tabNameInput = document.getElementById("tab-name");
+const applyTabNameBtn = document.getElementById("apply-tab-name");
+const faviconUrlInput = document.getElementById("favicon-url");
+const faviconUrlError = document.getElementById("favicon-url-error");
+const faviconFileInput = document.getElementById("favicon-file");
+const applyFaviconBtn = document.getElementById("apply-favicon");
+const clearFaviconBtn = document.getElementById("clear-favicon");
+const restoreDefaultsBtn = document.getElementById("restore-defaults");
+const exportThemeBtn = document.getElementById("export-theme-btn");
+const importThemeBtn = document.getElementById("import-theme-btn");
+const importThemeFile = document.getElementById("import-theme-file");
+const settingsBranding = document.getElementById("settings-branding");
+const settingsVersionEl = document.getElementById("settings-version");
+const updateNotice = document.getElementById("update-notice");
+const updateVersionEl = document.getElementById("update-version");
 
 // --- Branding ---
 const version = chrome.runtime.getManifest().version;
 settingsBranding.textContent = "Nozy-NT";
-settingsVersionEl.textContent = "(v" + version + ")";
+settingsVersionEl.textContent = `(v${version})`;
 
 // --- Lazy version check (lowest priority) ---
-requestIdleCallback(function () {
+requestIdleCallback(() => {
   fetch("https://raw.githubusercontent.com/partiallywritten/Nozy-NT/refs/heads/main/manifest.json")
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      var latestVersion = data && data.version;
+    .then((res) => res.json())
+    .then((data) => {
+      const latestVersion = data && data.version;
       if (latestVersion && latestVersion !== version) {
         updateVersionEl.textContent = latestVersion;
         updateNotice.classList.remove("hidden");
       }
     })
-    .catch(function () { /* silently ignore network errors */ });
+    .catch(() => { /* silently ignore network errors */ });
 }, { timeout: 5000 });
 
-var searchForm = document.getElementById("search-form");
-var searchInput = document.getElementById("search-input");
-var searchUrlInput = document.getElementById("search-url");
-var searchUrlError = document.getElementById("search-url-error");
-var applySearchUrlBtn = document.getElementById("apply-search-url");
-var clearSearchUrlBtn = document.getElementById("clear-search-url");
+const searchForm = document.getElementById("search-form");
+const searchInput = document.getElementById("search-input");
+const searchUrlInput = document.getElementById("search-url");
+const searchUrlError = document.getElementById("search-url-error");
+const applySearchUrlBtn = document.getElementById("apply-search-url");
+const clearSearchUrlBtn = document.getElementById("clear-search-url");
 
 // --- Settings-only Utilities ---
 
 function compressImage(dataUrl, maxWidth, maxHeight, quality, callback) {
-    var img = new Image();
-    img.onload = function() {
-        var width = img.naturalWidth;
-        var height = img.naturalHeight;
+    const img = new Image();
+    img.onload = () => {
+        let width = img.naturalWidth;
+        let height = img.naturalHeight;
         if (width > maxWidth || height > maxHeight) {
-            var scale = Math.min(maxWidth / width, maxHeight / height);
+            const scale = Math.min(maxWidth / width, maxHeight / height);
             width = Math.round(width * scale);
             height = Math.round(height * scale);
         }
-        var canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
-        var ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
-        var result = canvas.toDataURL("image/jpeg", quality);
+        const result = canvas.toDataURL("image/jpeg", quality);
         // Release the canvas backing store immediately rather than waiting for GC.
         // A 1080p canvas holds ~8 MB of pixel data that Chrome otherwise retains
         // until the next GC cycle.
         canvas.width = 0;
         callback(result);
     };
-    img.onerror = function() {
+    img.onerror = () => {
         callback(dataUrl);
     };
     img.src = dataUrl;
@@ -135,7 +135,7 @@ function clampFileSizeCap(val) {
 }
 
 function getBgFileSizeCapBytes() {
-    var raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
+    const raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
     return clampFileSizeCap(Number(raw)) * 1024 * 1024;
 }
 
@@ -145,15 +145,15 @@ function readImageFile(file, errorElement, onSuccess) {
         if (errorElement) errorElement.textContent = "Please upload an image file.";
         return;
     }
-    var maxBytes = getBgFileSizeCapBytes();
+    const maxBytes = getBgFileSizeCapBytes();
     if (file.size > maxBytes) {
-        var mb = Math.round(maxBytes / (1024 * 1024));
-        if (errorElement) errorElement.textContent = "File must be under " + mb + " MB.";
+        const mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = `File must be under ${mb} MB.`;
         return;
     }
-    var reader = new FileReader();
-    reader.onload = function(event) {
-        var dataUrl = String(event.target.result);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const dataUrl = String(event.target.result);
         if (!dataUrl.startsWith("data:image/")) {
             if (errorElement) errorElement.textContent = "Could not read this image.";
             return;
@@ -161,7 +161,7 @@ function readImageFile(file, errorElement, onSuccess) {
         if (errorElement) errorElement.textContent = "";
         onSuccess(dataUrl);
     };
-    reader.onerror = function() {
+    reader.onerror = () => {
         if (errorElement) errorElement.textContent = "Could not read this image.";
     };
     reader.readAsDataURL(file);
@@ -173,10 +173,10 @@ function readVideoFile(file, errorElement, onSuccess) {
         if (errorElement) errorElement.textContent = "Please upload an mp4 or webm video file.";
         return;
     }
-    var maxBytes = getBgFileSizeCapBytes();
+    const maxBytes = getBgFileSizeCapBytes();
     if (file.size > maxBytes) {
-        var mb = Math.round(maxBytes / (1024 * 1024));
-        if (errorElement) errorElement.textContent = "Video must be under " + mb + " MB.";
+        const mb = Math.round(maxBytes / (1024 * 1024));
+        if (errorElement) errorElement.textContent = `Video must be under ${mb} MB.`;
         return;
     }
     if (errorElement) errorElement.textContent = "";
@@ -195,9 +195,9 @@ function forceBgCapToDefault() {
 }
 
 function isAnimatedWebpFile(file, callback) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var bytes = new Uint8Array(e.target.result);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const bytes = new Uint8Array(e.target.result);
         // Verify RIFF....WEBP header
         if (bytes.length < 12 ||
             bytes[0] !== 0x52 || bytes[1] !== 0x49 || bytes[2] !== 0x46 || bytes[3] !== 0x46 ||
@@ -206,7 +206,7 @@ function isAnimatedWebpFile(file, callback) {
             return;
         }
         // Presence of an ANIM chunk indicates animated WebP
-        for (var i = 12; i < bytes.length - 3; i++) {
+        for (let i = 12; i < bytes.length - 3; i++) {
             if (bytes[i] === 0x41 && bytes[i+1] === 0x4E && bytes[i+2] === 0x49 && bytes[i+3] === 0x4D) {
                 callback(true);
                 return;
@@ -214,16 +214,16 @@ function isAnimatedWebpFile(file, callback) {
         }
         callback(false);
     };
-    reader.onerror = function() { callback(false); };
+    reader.onerror = () => { callback(false); };
     // ANIM chunk appears within the first few hundred bytes; 1 KB is more than sufficient
     reader.readAsArrayBuffer(file.slice(0, 1024));
 }
 
 function processUrlInput(inputEl, errorEl, errorMessage, onSuccess) {
-    var raw = inputEl.value.trim();
+    const raw = inputEl.value.trim();
     if (!raw) return;
 
-    var safeUrl = sanitizeHttpUrl(raw);
+    const safeUrl = sanitizeHttpUrl(raw);
     if (!safeUrl) {
         inputEl.setAttribute("aria-invalid", "true");
         if (errorEl) errorEl.textContent = errorMessage;
@@ -237,7 +237,7 @@ function processUrlInput(inputEl, errorEl, errorMessage, onSuccess) {
 }
 
 function clearErrorOnInput(inputEl, errorEl) {
-    inputEl.addEventListener("input", function() {
+    inputEl.addEventListener("input", () => {
         if (inputEl.getAttribute("aria-invalid")) {
             inputEl.removeAttribute("aria-invalid");
             if (errorEl) errorEl.textContent = "";
@@ -248,7 +248,7 @@ function clearErrorOnInput(inputEl, errorEl) {
 // --- Settings-only Helpers ---
 
 function getBgImageCapDimensions() {
-    var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    const cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
     if (cap === "default") return null;
     if (cap === "4K") return { width: 3840, height: 2160 };
     if (cap === "1440p") return { width: 2560, height: 1440 };
@@ -259,12 +259,12 @@ function applyLocalBackgroundFile(file) {
     if (!file) return;
     if (file.type === "video/mp4" || file.type === "video/webm") {
         forceBgCapToDefault();
-        readVideoFile(file, bgImageError, function(videoFile) {
+        readVideoFile(file, bgImageError, (videoFile) => {
             bgImageInput.value = "";
             bgImageInput.removeAttribute("aria-invalid");
             markUserTheme();
-            saveBgVideo(videoFile, function() {
-                getBgImage(function(blobUrl) {
+            saveBgVideo(videoFile, () => {
+                getBgImage((blobUrl) => {
                     setBodyBgVideo(blobUrl);
                     syncBgCapSelectState();
                 });
@@ -272,7 +272,7 @@ function applyLocalBackgroundFile(file) {
         });
         return;
     }
-    readImageFile(file, bgImageError, function(dataUrl) {
+    readImageFile(file, bgImageError, (dataUrl) => {
         bgImageInput.value = "";
         bgImageInput.removeAttribute("aria-invalid");
         markUserTheme();
@@ -284,16 +284,16 @@ function applyLocalBackgroundFile(file) {
             return;
         }
         if (file.type === "image/webp") {
-            isAnimatedWebpFile(file, function(animated) {
+            isAnimatedWebpFile(file, (animated) => {
                 if (animated) forceBgCapToDefault();
                 // Read dims after forceBgCapToDefault() so animated WebPs always get null dims
-                var dims = getBgImageCapDimensions();
+                const dims = getBgImageCapDimensions();
                 if (!dims) {
                     setBodyBgImage(dataUrl);
                     saveBgImage(dataUrl);
                     syncBgCapSelectState();
                 } else {
-                    compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
+                    compressImage(dataUrl, dims.width, dims.height, 0.8, (compressed) => {
                         setBodyBgImage(compressed);
                         saveBgImage(compressed);
                         syncBgCapSelectState();
@@ -302,14 +302,14 @@ function applyLocalBackgroundFile(file) {
             });
             return;
         }
-        var dims = getBgImageCapDimensions();
+        const dims = getBgImageCapDimensions();
         if (!dims) {
             setBodyBgImage(dataUrl);
             saveBgImage(dataUrl);
             syncBgCapSelectState();
             return;
         }
-        compressImage(dataUrl, dims.width, dims.height, 0.8, function(compressed) {
+        compressImage(dataUrl, dims.width, dims.height, 0.8, (compressed) => {
             setBodyBgImage(compressed);
             saveBgImage(compressed);
             syncBgCapSelectState();
@@ -320,11 +320,11 @@ function applyLocalBackgroundFile(file) {
 function migrateBgImageForNewCap() {
     // Video backgrounds are always stored in IDB regardless of cap — nothing to migrate.
     if (localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video") return;
-    getBgImage(function(current) {
+    getBgImage((current) => {
         if (!current) return;
-        var isLocal = current.startsWith("data:image/") || current.startsWith("blob:");
+        const isLocal = current.startsWith("data:image/") || current.startsWith("blob:");
         if (!isLocal) return; // remote URLs are stored in IDB regardless of cap
-        var dims = getBgImageCapDimensions();
+        const dims = getBgImageCapDimensions();
         if (!dims) {
             // Moving to "default" — only migrate if the image is currently a data URL (not yet a blob in IDB)
             if (current.startsWith("blob:")) return; // already in IDB, nothing to do
@@ -336,7 +336,7 @@ function migrateBgImageForNewCap() {
                 saveBgImage(current);
                 return;
             }
-            compressImage(current, dims.width, dims.height, 0.8, function(compressed) {
+            compressImage(current, dims.width, dims.height, 0.8, (compressed) => {
                 setBodyBgImage(compressed);
                 saveBgImage(compressed); // routes to IDB since cap != "default"
             });
@@ -345,7 +345,7 @@ function migrateBgImageForNewCap() {
 }
 
 function applyLocalFaviconFile(file) {
-    readImageFile(file, faviconUrlError, function(dataUrl) {
+    readImageFile(file, faviconUrlError, (dataUrl) => {
         faviconUrlInput.value = "";
         faviconUrlInput.removeAttribute("aria-invalid");
         localStorage.setItem(STORAGE_KEYS.FAVICON, dataUrl);
@@ -357,37 +357,37 @@ function applyLocalFaviconFile(file) {
 // --- ZIP Builder ---
 
 var _crc32Table = (function () {
-    var table = new Int32Array(256);
-    for (var i = 0; i < 256; i++) {
-        var c = i;
-        for (var j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    const table = new Int32Array(256);
+    for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
         table[i] = c;
     }
     return table;
 }());
 
 function crc32(data) {
-    var crc = -1;
-    for (var i = 0; i < data.length; i++) {
+    let crc = -1;
+    for (let i = 0; i < data.length; i++) {
         crc = (crc >>> 8) ^ _crc32Table[(crc ^ data[i]) & 0xFF];
     }
     return (crc ^ -1) >>> 0;
 }
 
 function buildZipBytes(files) {
-    var encoder = new TextEncoder();
-    var localParts = [];
-    var centralParts = [];
-    var offset = 0;
+    const encoder = new TextEncoder();
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
 
-    files.forEach(function (file) {
-        var nameBytes = encoder.encode(file.name);
-        var data = file.data;
-        var checksum = crc32(data);
-        var size = data.length;
+    files.forEach((file) => {
+        const nameBytes = encoder.encode(file.name);
+        const data = file.data;
+        const checksum = crc32(data);
+        const size = data.length;
 
-        var local = new Uint8Array(30 + nameBytes.length);
-        var lv = new DataView(local.buffer);
+        const local = new Uint8Array(30 + nameBytes.length);
+        const lv = new DataView(local.buffer);
         lv.setUint32(0, 0x04034b50, true);
         lv.setUint16(4, 20, true);
         lv.setUint16(6, 0, true);
@@ -402,8 +402,8 @@ function buildZipBytes(files) {
         local.set(nameBytes, 30);
         localParts.push(local, data);
 
-        var central = new Uint8Array(46 + nameBytes.length);
-        var cv = new DataView(central.buffer);
+        const central = new Uint8Array(46 + nameBytes.length);
+        const cv = new DataView(central.buffer);
         cv.setUint32(0, 0x02014b50, true);
         cv.setUint16(4, 20, true);
         cv.setUint16(6, 20, true);
@@ -427,11 +427,11 @@ function buildZipBytes(files) {
         offset += 30 + nameBytes.length + size;
     });
 
-    var centralStart = offset;
-    var centralSize = centralParts.reduce(function (s, p) { return s + p.length; }, 0);
+    const centralStart = offset;
+    const centralSize = centralParts.reduce((s, p) => s + p.length, 0);
 
-    var eocd = new Uint8Array(22);
-    var ev = new DataView(eocd.buffer);
+    const eocd = new Uint8Array(22);
+    const ev = new DataView(eocd.buffer);
     ev.setUint32(0, 0x06054b50, true);
     ev.setUint16(4, 0, true);
     ev.setUint16(6, 0, true);
@@ -441,27 +441,27 @@ function buildZipBytes(files) {
     ev.setUint32(16, centralStart, true);
     ev.setUint16(20, 0, true);
 
-    var allParts = localParts.concat(centralParts).concat([eocd]);
-    var totalLen = allParts.reduce(function (s, p) { return s + p.length; }, 0);
-    var result = new Uint8Array(totalLen);
-    var pos = 0;
-    allParts.forEach(function (p) { result.set(p, pos); pos += p.length; });
+    const allParts = localParts.concat(centralParts).concat([eocd]);
+    const totalLen = allParts.reduce((s, p) => s + p.length, 0);
+    const result = new Uint8Array(totalLen);
+    let pos = 0;
+    allParts.forEach((p) => { result.set(p, pos); pos += p.length; });
     return result;
 }
 
 function dataUrlToBytes(dataUrl) {
-    var comma = dataUrl.indexOf(",");
-    var base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
-    var binary = atob(base64);
-    var bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const comma = dataUrl.indexOf(",");
+    const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     return bytes;
 }
 
 // --- Panel & Modal ---
 
 function syncExportBtnVisibility() {
-    var isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
+    const isUser = localStorage.getItem(STORAGE_KEYS.THEME) === "user";
     exportThemeBtn.classList.toggle("hidden", !isUser);
 }
 
@@ -471,7 +471,7 @@ function markUserTheme() {
 }
 
 function exportUserTheme() {
-    var theme = {
+    const theme = {
         name: "User Theme",
         bgColor: localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR,
         surfaceColor: localStorage.getItem(STORAGE_KEYS.SURFACE_COLOR) || DEFAULTS.SURFACE_COLOR,
@@ -488,11 +488,11 @@ function exportUserTheme() {
         tabName: localStorage.getItem(STORAGE_KEYS.TAB_NAME) || "",
         favicon: localStorage.getItem(STORAGE_KEYS.FAVICON) || ""
     };
-    var jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
-    var themeId = "nnt-" + crc32(jsonBytes).toString(16).padStart(8, "0");
-    var fileName = themeId + ".zip";
+    const jsonBytes = new TextEncoder().encode(JSON.stringify(theme, null, 2));
+    const themeId = `nnt-${crc32(jsonBytes).toString(16).padStart(8, "0")}`;
+    const fileName = `${themeId}.zip`;
 
-    getBgImage(function (bgImage) {
+    getBgImage((bgImage) => {
         function bgFilenameFromMime(mime) {
             if (mime === "image/webp") return "background.webp";
             if (mime === "video/mp4") return "background.mp4";
@@ -501,12 +501,12 @@ function exportUserTheme() {
         }
 
         function buildAndDownload(bgBytes, bgFilename) {
-            var files = [{ name: themeId + "/theme.json", data: jsonBytes }];
-            if (bgBytes) files.push({ name: themeId + "/" + (bgFilename || "background.jpg"), data: bgBytes });
-            var zipBytes = buildZipBytes(files);
-            var blob = new Blob([zipBytes], { type: "application/zip" });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement("a");
+            const files = [{ name: `${themeId}/theme.json`, data: jsonBytes }];
+            if (bgBytes) files.push({ name: `${themeId}/${bgFilename || "background.jpg"}`, data: bgBytes });
+            const zipBytes = buildZipBytes(files);
+            const blob = new Blob([zipBytes], { type: "application/zip" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
             a.href = url;
             a.download = fileName;
             document.body.appendChild(a);
@@ -520,41 +520,37 @@ function exportUserTheme() {
             return;
         }
         if (bgImage.startsWith("data:image/")) {
-            var mimeMatch = bgImage.match(/^data:(image\/[^;,]+)/);
-            var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+            const mimeMatch = bgImage.match(/^data:(image\/[^;,]+)/);
+            const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
             buildAndDownload(dataUrlToBytes(bgImage), bgFilenameFromMime(mime));
             return;
         }
         if (bgImage.startsWith("blob:")) {
-            var bgType = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE);
-            var blobFallbackMime = bgType === "video" ? "video/mp4" : "image/webp";
+            const bgType = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE);
+            const blobFallbackMime = bgType === "video" ? "video/mp4" : "image/webp";
             fetch(bgImage)
-                .then(function(r) {
-                    var fetchedMime = (r.headers.get("content-type") || blobFallbackMime).split(";")[0].trim();
-                    return r.arrayBuffer().then(function(buf) {
-                        return { buf: buf, mime: fetchedMime };
-                    });
+                .then((r) => {
+                    const fetchedMime = (r.headers.get("content-type") || blobFallbackMime).split(";")[0].trim();
+                    return r.arrayBuffer().then((buf) => ({ buf, mime: fetchedMime }));
                 })
-                .then(function(res) { buildAndDownload(new Uint8Array(res.buf), bgFilenameFromMime(res.mime)); })
-                .catch(function() { buildAndDownload(null); });
+                .then((res) => { buildAndDownload(new Uint8Array(res.buf), bgFilenameFromMime(res.mime)); })
+                .catch(() => { buildAndDownload(null); });
             return;
         }
-        var safeUrl = sanitizeHttpUrl(bgImage);
+        const safeUrl = sanitizeHttpUrl(bgImage);
         if (!safeUrl) {
             buildAndDownload(null);
             return;
         }
         fetch(safeUrl)
-            .then(function (r) {
+            .then((r) => {
                 if (!r.ok) throw new Error("Fetch failed");
-                var contentType = r.headers.get("content-type") || "";
-                var fetchedMime = contentType.split(";")[0].trim();
-                return r.arrayBuffer().then(function(buf) {
-                    return { buf: buf, mime: fetchedMime };
-                });
+                const contentType = r.headers.get("content-type") || "";
+                const fetchedMime = contentType.split(";")[0].trim();
+                return r.arrayBuffer().then((buf) => ({ buf, mime: fetchedMime }));
             })
-            .then(function (result) { buildAndDownload(new Uint8Array(result.buf), bgFilenameFromMime(result.mime)); })
-            .catch(function () { buildAndDownload(null); });
+            .then((result) => { buildAndDownload(new Uint8Array(result.buf), bgFilenameFromMime(result.mime)); })
+            .catch(() => { buildAndDownload(null); });
     });
 }
 
@@ -563,18 +559,18 @@ function exportUserTheme() {
 // Parses local-file-header entries from an uncompressed zip (store method only).
 // Returns an array of { name, data } objects for each file entry found.
 function parseZipEntries(bytes) {
-    var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    var entries = [];
-    var i = 0;
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const entries = [];
+    let i = 0;
     while (i <= bytes.length - 30) {
         if (view.getUint32(i, true) !== 0x04034b50) break;
-        var nameLen = view.getUint16(i + 26, true);
-        var extraLen = view.getUint16(i + 28, true);
-        var compSize = view.getUint32(i + 18, true);
-        var name = new TextDecoder().decode(bytes.subarray(i + 30, i + 30 + nameLen));
-        var dataStart = i + 30 + nameLen + extraLen;
-        var data = bytes.subarray(dataStart, dataStart + compSize);
-        entries.push({ name: name, data: data });
+        const nameLen = view.getUint16(i + 26, true);
+        const extraLen = view.getUint16(i + 28, true);
+        const compSize = view.getUint32(i + 18, true);
+        const name = new TextDecoder().decode(bytes.subarray(i + 30, i + 30 + nameLen));
+        const dataStart = i + 30 + nameLen + extraLen;
+        const data = bytes.subarray(dataStart, dataStart + compSize);
+        entries.push({ name, data });
         i = dataStart + compSize;
     }
     return entries;
@@ -586,15 +582,15 @@ function parseZipEntries(bytes) {
 function importThemeFromZip(file) {
     if (!file) return;
     // Matches background files with or without a leading folder segment
-    var bgFileRe = /(^|\/)background\.(webp|jpg|jpeg|webm|mp4)$/;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var bytes = new Uint8Array(e.target.result);
-        var entries = parseZipEntries(bytes);
+    const bgFileRe = /(^|\/)background\.(webp|jpg|jpeg|webm|mp4)$/;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const bytes = new Uint8Array(e.target.result);
+        const entries = parseZipEntries(bytes);
 
-        var themeEntry = null;
-        var bgEntry = null;
-        entries.forEach(function(entry) {
+        let themeEntry = null;
+        let bgEntry = null;
+        entries.forEach((entry) => {
             if (/(^|\/)theme\.json$/.test(entry.name)) {
                 themeEntry = entry;
             } else if (bgFileRe.test(entry.name)) {
@@ -607,7 +603,7 @@ function importThemeFromZip(file) {
             return;
         }
 
-        var themeJson;
+        let themeJson;
         try {
             themeJson = JSON.parse(new TextDecoder().decode(themeEntry.data));
         } catch (err) {
@@ -616,45 +612,45 @@ function importThemeFromZip(file) {
         }
 
         // Derive the theme id from the zip filename (nnt-* prefix) or fall back to "user"
-        var themeId = "user";
-        var zipName = file.name.replace(/\.zip$/i, "");
+        let themeId = "user";
+        const zipName = file.name.replace(/\.zip$/i, "");
         if (/^nnt-/.test(zipName)) {
             themeId = zipName;
         }
 
         // Pass bgImageEnabled:false so applyThemePreset does not attempt to fetch the
         // background from a theme folder; we apply the background from the zip below.
-        var themeForApply = Object.assign({}, themeJson, { bgImageEnabled: bgEntry ? false : themeJson.bgImageEnabled });
+        const themeForApply = Object.assign({}, themeJson, { bgImageEnabled: bgEntry ? false : themeJson.bgImageEnabled });
         applyThemePreset(themeForApply, themeId);
 
         if (bgEntry) {
             // Re-enable the background now that we are supplying it directly from the zip
             localStorage.setItem(STORAGE_KEYS.BG_IMAGE_ENABLED, "true");
-            var bgName = bgEntry.name.split("/").pop();
-            var isVideo = /\.(webm|mp4)$/.test(bgName);
-            var mimeMap = { "webp": "image/webp", "jpg": "image/jpeg", "jpeg": "image/jpeg", "mp4": "video/mp4", "webm": "video/webm" };
-            var ext = bgName.split(".").pop().toLowerCase();
-            var mime = mimeMap[ext] || "image/jpeg";
-            var blob = new Blob([bgEntry.data], { type: mime });
+            const bgName = bgEntry.name.split("/").pop();
+            const isVideo = /\.(webm|mp4)$/.test(bgName);
+            const mimeMap = { "webp": "image/webp", "jpg": "image/jpeg", "jpeg": "image/jpeg", "mp4": "video/mp4", "webm": "video/webm" };
+            const ext = bgName.split(".").pop().toLowerCase();
+            const mime = mimeMap[ext] || "image/jpeg";
+            const blob = new Blob([bgEntry.data], { type: mime });
             if (isVideo) {
-                saveBgVideo(blob, function() {
-                    getBgImage(function(blobUrl) {
+                saveBgVideo(blob, () => {
+                    getBgImage((blobUrl) => {
                         if (blobUrl) setBodyBgVideo(blobUrl);
                         else applyBackground();
                     });
                 });
             } else {
-                var dims = getBgImageCapDimensions();
+                const dims = getBgImageCapDimensions();
                 if (!dims) {
-                    saveBgImageBlob(blob, function() {
-                        getBgImage(function(url) {
+                    saveBgImageBlob(blob, () => {
+                        getBgImage((url) => {
                             if (url) setBodyBgImage(url);
                             else applyBackground();
                         });
                     });
                 } else {
-                    var objUrl = URL.createObjectURL(blob);
-                    compressImage(objUrl, dims.width, dims.height, 0.8, function(compressed) {
+                    const objUrl = URL.createObjectURL(blob);
+                    compressImage(objUrl, dims.width, dims.height, 0.8, (compressed) => {
                         URL.revokeObjectURL(objUrl);
                         setBodyBgImage(compressed);
                         saveBgImage(compressed);
@@ -700,8 +696,8 @@ function closeModal() {
 
 // --- Restore Defaults ---
 
-var restoreConfirmPending = false;
-var restoreConfirmTimer = null;
+let restoreConfirmPending = false;
+let restoreConfirmTimer = null;
 
 function resetConfirmState() {
     restoreConfirmPending = false;
@@ -712,16 +708,16 @@ function resetConfirmState() {
 
 function restoreAllDefaults() {
     fetch("themes/included/0/theme.json")
-        .then(function(r) {
+        .then((r) => {
             if (!r.ok) throw new Error("Not found");
             return r.json();
         })
-        .then(function(themeData) {
+        .then((themeData) => {
             applyThemePreset(themeData, 0);
             closeThemesOverlay();
             syncExportBtnVisibility();
         })
-        .catch(function() {
+        .catch(() => {
             // theme.json missing — at minimum record the active theme id
             localStorage.setItem(STORAGE_KEYS.THEME, "0");
             closeThemesOverlay();
@@ -737,20 +733,20 @@ closeSettingsBtn.addEventListener("click", closeSettingsPanel);
 addBtn.addEventListener("click", openModal);
 modalCancel.addEventListener("click", closeModal);
 exportThemeBtn.addEventListener("click", exportUserTheme);
-importThemeBtn.addEventListener("click", function() { importThemeFile.click(); });
-importThemeFile.addEventListener("change", function() {
-    var file = this.files && this.files[0];
+importThemeBtn.addEventListener("click", () => { importThemeFile.click(); });
+importThemeFile.addEventListener("change", () => {
+    const file = importThemeFile.files && importThemeFile.files[0];
     if (file) {
         importThemeFromZip(file);
-        this.value = "";
+        importThemeFile.value = "";
     }
 });
 
-modalOverlay.addEventListener("click", function(e) {
+modalOverlay.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal();
 });
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
         if (!themesOverlay.classList.contains("hidden")) {
             closeThemesOverlay();
@@ -762,10 +758,10 @@ document.addEventListener("keydown", function(e) {
 });
 
 // Accordion exclusivity
-settingsSections.forEach(function(section) {
-    section.addEventListener("toggle", function() {
+settingsSections.forEach((section) => {
+    section.addEventListener("toggle", () => {
         if (section.open) {
-            settingsSections.forEach(function(other) {
+            settingsSections.forEach((other) => {
                 if (other !== section && other.open) {
                     other.removeAttribute("open");
                 }
@@ -784,7 +780,7 @@ function syncHexFromPicker(pickerEl, hexEl) {
 }
 
 function syncPickerFromHex(hexEl, pickerEl, onValid) {
-    var raw = hexEl.value.trim();
+    let raw = hexEl.value.trim();
     if (!raw.startsWith("#")) raw = "#" + raw;
     if (HEX_RE.test(raw)) {
         hexEl.value = raw.toUpperCase();
@@ -872,28 +868,28 @@ textColorHexInput.addEventListener("input", function() {
  * elements never touch the very edge of the page.
  */
 function updatePositionSliderLimits() {
-    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-    var border = rem; // 1 rem padding on each edge
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const border = rem; // 1 rem padding on each edge
 
     // Clock position limits
-    var clockSection = document.querySelector(".clock-section");
+    const clockSection = document.querySelector(".clock-section");
     if (clockSection) {
-        var currentClockX = Number(clockXInput.value) || 0;
-        var currentClockY = Number(clockYInput.value) || 0;
-        var clockRect = clockSection.getBoundingClientRect();
+        const currentClockX = Number(clockXInput.value) || 0;
+        const currentClockY = Number(clockYInput.value) || 0;
+        const clockRect = clockSection.getBoundingClientRect();
         if (clockRect.width > 0 && clockRect.height > 0) {
             // Subtract current transform offset to get the element's natural position
-            var clockNatLeft   = clockRect.left   - currentClockX;
-            var clockNatRight  = clockRect.right  - currentClockX;
-            var clockNatTop    = clockRect.top    - currentClockY;
-            var clockNatBottom = clockRect.bottom - currentClockY;
+            const clockNatLeft   = clockRect.left   - currentClockX;
+            const clockNatRight  = clockRect.right  - currentClockX;
+            const clockNatTop    = clockRect.top    - currentClockY;
+            const clockNatBottom = clockRect.bottom - currentClockY;
 
-            var clockMaxX = Math.floor(vw - border - clockNatRight);
-            var clockMinX = Math.ceil(border - clockNatLeft);
-            var clockMaxY = Math.floor(vh - border - clockNatBottom);
-            var clockMinY = Math.ceil(border - clockNatTop);
+            let clockMaxX = Math.floor(vw - border - clockNatRight);
+            let clockMinX = Math.ceil(border - clockNatLeft);
+            let clockMaxY = Math.floor(vh - border - clockNatBottom);
+            let clockMinY = Math.ceil(border - clockNatTop);
 
             // Guard: element wider/taller than usable space — allow centering at 0
             if (clockMinX > clockMaxX) { clockMinX = 0; clockMaxX = 0; }
@@ -906,37 +902,37 @@ function updatePositionSliderLimits() {
 
             // Re-derive the displayed position from the stored fraction and clamp it
             // so the element stays on-screen after every resize.
-            var clockXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_X) || 0, vw);
-            var clockYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || 0, vh);
-            var clockXClamped = Math.min(clockMaxX, Math.max(clockMinX, clockXIdeal));
-            var clockYClamped = Math.min(clockMaxY, Math.max(clockMinY, clockYIdeal));
+            const clockXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_X) || 0, vw);
+            const clockYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || 0, vh);
+            const clockXClamped = Math.min(clockMaxX, Math.max(clockMinX, clockXIdeal));
+            const clockYClamped = Math.min(clockMaxY, Math.max(clockMinY, clockYIdeal));
             clockXInput.value = clockXClamped;
             clockYInput.value = clockYClamped;
-            docStyle.setProperty("--clock-x", clockXClamped + "px");
-            docStyle.setProperty("--clock-y", clockYClamped + "px");
+            docStyle.setProperty("--clock-x", `${clockXClamped}px`);
+            docStyle.setProperty("--clock-y", `${clockYClamped}px`);
         }
     }
 
     // Search bar position limits
     // Use the search-form element for horizontal bounds (it has the visual width)
     // and the search-section element for vertical bounds.
-    var searchSectionEl = document.querySelector(".search-section");
-    var searchFormEl = searchSectionEl && searchSectionEl.querySelector(".search-form");
+    const searchSectionEl = document.querySelector(".search-section");
+    const searchFormEl = searchSectionEl && searchSectionEl.querySelector(".search-form");
     if (searchSectionEl && searchFormEl) {
-        var currentSearchX = Number(searchXInput.value) || 0;
-        var currentSearchY = Number(searchYInput.value) || 0;
-        var formRect    = searchFormEl.getBoundingClientRect();
-        var sectionRect = searchSectionEl.getBoundingClientRect();
+        const currentSearchX = Number(searchXInput.value) || 0;
+        const currentSearchY = Number(searchYInput.value) || 0;
+        const formRect    = searchFormEl.getBoundingClientRect();
+        const sectionRect = searchSectionEl.getBoundingClientRect();
         if (formRect.width > 0 && sectionRect.height > 0) {
-            var formNatLeft      = formRect.left      - currentSearchX;
-            var formNatRight     = formRect.right     - currentSearchX;
-            var sectionNatTop    = sectionRect.top    - currentSearchY;
-            var sectionNatBottom = sectionRect.bottom - currentSearchY;
+            const formNatLeft      = formRect.left      - currentSearchX;
+            const formNatRight     = formRect.right     - currentSearchX;
+            const sectionNatTop    = sectionRect.top    - currentSearchY;
+            const sectionNatBottom = sectionRect.bottom - currentSearchY;
 
-            var searchMaxX = Math.floor(vw - border - formNatRight);
-            var searchMinX = Math.ceil(border - formNatLeft);
-            var searchMaxY = Math.floor(vh - border - sectionNatBottom);
-            var searchMinY = Math.ceil(border - sectionNatTop);
+            let searchMaxX = Math.floor(vw - border - formNatRight);
+            let searchMinX = Math.ceil(border - formNatLeft);
+            let searchMaxY = Math.floor(vh - border - sectionNatBottom);
+            let searchMinY = Math.ceil(border - sectionNatTop);
 
             if (searchMinX > searchMaxX) { searchMinX = 0; searchMaxX = 0; }
             if (searchMinY > searchMaxY) { searchMinY = 0; searchMaxY = 0; }
@@ -947,33 +943,33 @@ function updatePositionSliderLimits() {
             searchYInput.max = searchMaxY;
 
             // Re-derive the displayed position from the stored fraction and clamp it.
-            var searchXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_X) || 0, vw);
-            var searchYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || 0, vh);
-            var searchXClamped = Math.min(searchMaxX, Math.max(searchMinX, searchXIdeal));
-            var searchYClamped = Math.min(searchMaxY, Math.max(searchMinY, searchYIdeal));
+            const searchXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_X) || 0, vw);
+            const searchYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || 0, vh);
+            const searchXClamped = Math.min(searchMaxX, Math.max(searchMinX, searchXIdeal));
+            const searchYClamped = Math.min(searchMaxY, Math.max(searchMinY, searchYIdeal));
             searchXInput.value = searchXClamped;
             searchYInput.value = searchYClamped;
-            docStyle.setProperty("--search-x", searchXClamped + "px");
-            docStyle.setProperty("--search-y", searchYClamped + "px");
+            docStyle.setProperty("--search-x", `${searchXClamped}px`);
+            docStyle.setProperty("--search-y", `${searchYClamped}px`);
         }
     }
 
     // Favorites position limits
-    var favoritesSectionEl = document.getElementById("favorites-section");
+    const favoritesSectionEl = document.getElementById("favorites-section");
     if (favoritesSectionEl) {
-        var currentFavX = Number(favoritesXInput.value) || 0;
-        var currentFavY = Number(favoritesYInput.value) || 0;
-        var favRect = favoritesSectionEl.getBoundingClientRect();
+        const currentFavX = Number(favoritesXInput.value) || 0;
+        const currentFavY = Number(favoritesYInput.value) || 0;
+        const favRect = favoritesSectionEl.getBoundingClientRect();
         if (favRect.width > 0 && favRect.height > 0) {
-            var favNatLeft   = favRect.left   - currentFavX;
-            var favNatRight  = favRect.right  - currentFavX;
-            var favNatTop    = favRect.top    - currentFavY;
-            var favNatBottom = favRect.bottom - currentFavY;
+            const favNatLeft   = favRect.left   - currentFavX;
+            const favNatRight  = favRect.right  - currentFavX;
+            const favNatTop    = favRect.top    - currentFavY;
+            const favNatBottom = favRect.bottom - currentFavY;
 
-            var favMaxX = Math.floor(vw - border - favNatRight);
-            var favMinX = Math.ceil(border - favNatLeft);
-            var favMaxY = Math.floor(vh - border - favNatBottom);
-            var favMinY = Math.ceil(border - favNatTop);
+            let favMaxX = Math.floor(vw - border - favNatRight);
+            let favMinX = Math.ceil(border - favNatLeft);
+            let favMaxY = Math.floor(vh - border - favNatBottom);
+            let favMinY = Math.ceil(border - favNatTop);
 
             if (favMinX > favMaxX) { favMinX = 0; favMaxX = 0; }
             if (favMinY > favMaxY) { favMinY = 0; favMaxY = 0; }
@@ -983,31 +979,31 @@ function updatePositionSliderLimits() {
             favoritesYInput.min = favMinY;
             favoritesYInput.max = favMaxY;
 
-            var favXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || 0, vw);
-            var favYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || 0, vh);
-            var favXClamped = Math.min(favMaxX, Math.max(favMinX, favXIdeal));
-            var favYClamped = Math.min(favMaxY, Math.max(favMinY, favYIdeal));
+            const favXIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || 0, vw);
+            const favYIdeal = fracToPx(localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || 0, vh);
+            const favXClamped = Math.min(favMaxX, Math.max(favMinX, favXIdeal));
+            const favYClamped = Math.min(favMaxY, Math.max(favMinY, favYIdeal));
             favoritesXInput.value = favXClamped;
             favoritesYInput.value = favYClamped;
-            docStyle.setProperty("--favorites-x", favXClamped + "px");
-            docStyle.setProperty("--favorites-y", favYClamped + "px");
+            docStyle.setProperty("--favorites-x", `${favXClamped}px`);
+            docStyle.setProperty("--favorites-y", `${favYClamped}px`);
         }
     }
 }
 
 // Debounced resize handler so limits stay accurate when the window changes size
-var _posLimitsResizeTimer = null;
-window.addEventListener("resize", function() {
+let _posLimitsResizeTimer = null;
+window.addEventListener("resize", () => {
     clearTimeout(_posLimitsResizeTimer);
     _posLimitsResizeTimer = setTimeout(updatePositionSliderLimits, 100);
 });
 
 // Coalescing guard: at most one rAF for updatePositionSliderLimits queued at a time
-var _rafPosLimitsPending = false;
+let _rafPosLimitsPending = false;
 function schedulePositionSliderLimits() {
     if (_rafPosLimitsPending) return;
     _rafPosLimitsPending = true;
-    requestAnimationFrame(function() {
+    requestAnimationFrame(() => {
         _rafPosLimitsPending = false;
         updatePositionSliderLimits();
     });
@@ -1086,14 +1082,14 @@ favoritesEnabledToggle.addEventListener("change", function() {
 
 favoritesShowAddToggle.addEventListener("change", function() {
     localStorage.setItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN, this.checked ? "true" : "false");
-    var btn = document.getElementById("add-btn");
+    const btn = document.getElementById("add-btn");
     if (btn) btn.classList.toggle("hidden", !this.checked);
 });
 
 favoritesLayoutSelect.addEventListener("change", function() {
-    var isColumn = this.value === "column";
+    const isColumn = this.value === "column";
     localStorage.setItem(STORAGE_KEYS.FAVORITES_LAYOUT, this.value);
-    var section = document.getElementById("favorites-section");
+    const section = document.getElementById("favorites-section");
     if (section) section.classList.toggle("favorites-column", isColumn);
     schedulePositionSliderLimits();
 });
@@ -1135,17 +1131,17 @@ bgFileSizeCapInput.addEventListener("change", function() {
     markUserTheme();
 });
 
-bgFileInput.addEventListener("change", function() {
+bgFileInput.addEventListener("change", () => {
     applyLocalBackgroundFile(bgFileInput.files && bgFileInput.files[0]);
 });
 
-applyBgBtn.addEventListener("click", function() {
-    var file = bgFileInput.files && bgFileInput.files[0];
+applyBgBtn.addEventListener("click", () => {
+    const file = bgFileInput.files && bgFileInput.files[0];
     if (file) {
         applyLocalBackgroundFile(file);
         return;
     }
-    processUrlInput(bgImageInput, bgImageError, "Please enter a valid http or https image URL.", function(safeUrl) {
+    processUrlInput(bgImageInput, bgImageError, "Please enter a valid http or https image URL.", (safeUrl) => {
         markUserTheme();
         saveBgImage(safeUrl);
         setBodyBgImage(safeUrl);
@@ -1153,7 +1149,7 @@ applyBgBtn.addEventListener("click", function() {
     });
 });
 
-clearBgBtn.addEventListener("click", function() {
+clearBgBtn.addEventListener("click", () => {
     markUserTheme();
     saveBgImage("");
     bgImageInput.value = "";
@@ -1165,11 +1161,11 @@ clearBgBtn.addEventListener("click", function() {
 });
 
 // Font Controls
-applyFontBtn.addEventListener("click", function() {
-    var rawFamily = fontFamilyInput.value.trim();
-    var fontFamily = rawFamily || DEFAULTS.FONT_FAMILY;
+applyFontBtn.addEventListener("click", () => {
+    const rawFamily = fontFamilyInput.value.trim();
+    const fontFamily = rawFamily || DEFAULTS.FONT_FAMILY;
 
-    var rawUrl = fontUrlInput.value.trim();
+    const rawUrl = fontUrlInput.value.trim();
     if (!rawUrl) {
         localStorage.removeItem(STORAGE_KEYS.FONT_URL);
         localStorage.setItem(STORAGE_KEYS.FONT_FAMILY, fontFamily);
@@ -1178,7 +1174,7 @@ applyFontBtn.addEventListener("click", function() {
         return;
     }
 
-    processUrlInput(fontUrlInput, fontUrlError, "Please enter a valid http or https stylesheet URL.", function(safeUrl) {
+    processUrlInput(fontUrlInput, fontUrlError, "Please enter a valid http or https stylesheet URL.", (safeUrl) => {
         localStorage.setItem(STORAGE_KEYS.FONT_URL, safeUrl);
         localStorage.setItem(STORAGE_KEYS.FONT_FAMILY, fontFamily);
         markUserTheme();
@@ -1187,32 +1183,32 @@ applyFontBtn.addEventListener("click", function() {
 });
 
 // Tab Name & Favicon Controls
-applyTabNameBtn.addEventListener("click", function() {
-    var name = tabNameInput.value.trim();
+applyTabNameBtn.addEventListener("click", () => {
+    const name = tabNameInput.value.trim();
     if (name) localStorage.setItem(STORAGE_KEYS.TAB_NAME, name);
     else localStorage.removeItem(STORAGE_KEYS.TAB_NAME);
     markUserTheme();
     document.title = name || "New Tab";
 });
 
-faviconFileInput.addEventListener("change", function() {
+faviconFileInput.addEventListener("change", () => {
     applyLocalFaviconFile(faviconFileInput.files && faviconFileInput.files[0]);
 });
 
-applyFaviconBtn.addEventListener("click", function() {
-    var file = faviconFileInput.files && faviconFileInput.files[0];
+applyFaviconBtn.addEventListener("click", () => {
+    const file = faviconFileInput.files && faviconFileInput.files[0];
     if (file) {
         applyLocalFaviconFile(file);
         return;
     }
-    processUrlInput(faviconUrlInput, faviconUrlError, "Please enter a valid http or https image URL.", function(safeUrl) {
+    processUrlInput(faviconUrlInput, faviconUrlError, "Please enter a valid http or https image URL.", (safeUrl) => {
         localStorage.setItem(STORAGE_KEYS.FAVICON, safeUrl);
         markUserTheme();
         setFavicon(safeUrl);
     });
 });
 
-clearFaviconBtn.addEventListener("click", function() {
+clearFaviconBtn.addEventListener("click", () => {
     localStorage.removeItem(STORAGE_KEYS.FAVICON);
     markUserTheme();
     faviconUrlInput.value = "";
@@ -1223,17 +1219,17 @@ clearFaviconBtn.addEventListener("click", function() {
 });
 
 // Search Form Submission
-searchForm.addEventListener("submit", function(e) {
+searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    var query = searchInput.value.trim();
+    const query = searchInput.value.trim();
     if (!query) return;
-    var template = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || DEFAULTS.SEARCH_URL;
+    const template = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || DEFAULTS.SEARCH_URL;
     window.location.href = template.replace("{query}", encodeURIComponent(query));
 });
 
 // Search URL Controls
-applySearchUrlBtn.addEventListener("click", function() {
-    var raw = searchUrlInput.value.trim();
+applySearchUrlBtn.addEventListener("click", () => {
+    const raw = searchUrlInput.value.trim();
     if (!raw) {
         localStorage.removeItem(STORAGE_KEYS.SEARCH_URL);
         searchUrlInput.removeAttribute("aria-invalid");
@@ -1246,7 +1242,7 @@ applySearchUrlBtn.addEventListener("click", function() {
         searchUrlInput.focus();
         return;
     }
-    var testUrl = sanitizeHttpUrl(raw.replace("{query}", "test"));
+    const testUrl = sanitizeHttpUrl(raw.replace("{query}", "test"));
     if (!testUrl) {
         searchUrlInput.setAttribute("aria-invalid", "true");
         searchUrlError.textContent = "Please enter a valid http or https URL containing {query}.";
@@ -1258,7 +1254,7 @@ applySearchUrlBtn.addEventListener("click", function() {
     localStorage.setItem(STORAGE_KEYS.SEARCH_URL, raw);
 });
 
-clearSearchUrlBtn.addEventListener("click", function() {
+clearSearchUrlBtn.addEventListener("click", () => {
     localStorage.removeItem(STORAGE_KEYS.SEARCH_URL);
     searchUrlInput.value = "";
     searchUrlInput.removeAttribute("aria-invalid");
@@ -1266,9 +1262,9 @@ clearSearchUrlBtn.addEventListener("click", function() {
 });
 
 // Favorites Save
-modalSave.addEventListener("click", function() {
-    var name = favNameInput.value.trim();
-    var url = favUrlInput.value.trim();
+modalSave.addEventListener("click", () => {
+    const name = favNameInput.value.trim();
+    let url = favUrlInput.value.trim();
 
     favNameInput.removeAttribute("aria-invalid");
     favUrlInput.removeAttribute("aria-invalid");
@@ -1302,8 +1298,8 @@ modalSave.addEventListener("click", function() {
     closeModal();
 });
 
-[favNameInput, favUrlInput].forEach(function(input) {
-    input.addEventListener("keydown", function(e) {
+[favNameInput, favUrlInput].forEach((input) => {
+    input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") modalSave.click();
     });
 });
@@ -1317,7 +1313,7 @@ clearErrorOnInput(faviconUrlInput, faviconUrlError);
 clearErrorOnInput(searchUrlInput, searchUrlError);
 
 // Restore Defaults
-restoreDefaultsBtn.addEventListener("click", function() {
+restoreDefaultsBtn.addEventListener("click", () => {
     if (restoreConfirmPending) {
         resetConfirmState();
         restoreAllDefaults();

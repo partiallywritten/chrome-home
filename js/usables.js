@@ -1,7 +1,7 @@
 "use strict";
 
 // --- Configuration & Constants ---
-var DEFAULTS = {
+const DEFAULTS = {
     BG_COLOR: "#003056",
     SURFACE_COLOR: "#003056",
     HIGHLIGHT_COLOR: "#be9da8",
@@ -20,9 +20,9 @@ var DEFAULTS = {
     SEARCH_URL: "https://www.google.com/search?q={query}",
 };
 
-var MAX_FILE_SIZE_MB = 250;
+const MAX_FILE_SIZE_MB = 250;
 
-var STORAGE_KEYS = {
+const STORAGE_KEYS = {
     BG_IMAGE_TYPE: "ch_bg_image_type",
     BG_FILE_SIZE_CAP: "ch_bg_file_size_cap",
     FAVORITES: "ch_favorites",
@@ -58,14 +58,14 @@ var STORAGE_KEYS = {
 };
 
 // --- Cached DOM References ---
-var docStyle = document.documentElement.style;
-var backgroundLayer = document.getElementById("background-layer");
-var backgroundVideo = document.getElementById("background-video");
+const docStyle = document.documentElement.style;
+const backgroundLayer = document.getElementById("background-layer");
+const backgroundVideo = document.getElementById("background-video");
 
 // --- Core Utilities ---
 
 function hexToRgb(sourceHex) {
-    var cleaned = sourceHex.slice(1);
+    const cleaned = sourceHex.slice(1);
     return {
         r: parseInt(cleaned.slice(0, 2), 16),
         g: parseInt(cleaned.slice(2, 4), 16),
@@ -73,17 +73,17 @@ function hexToRgb(sourceHex) {
     };
 }
 
-var DEFAULT_TEXT_RGB = hexToRgb(DEFAULTS.TEXT_COLOR);
+const DEFAULT_TEXT_RGB = hexToRgb(DEFAULTS.TEXT_COLOR);
 
 function hexToRgba(hex, alpha) {
-    var validHex = /^#([A-Fa-f0-9]{6})$/;
-    var rgb = validHex.test(hex) ? hexToRgb(hex) : DEFAULT_TEXT_RGB;
+    const validHex = /^#([A-Fa-f0-9]{6})$/;
+    const rgb = validHex.test(hex) ? hexToRgb(hex) : DEFAULT_TEXT_RGB;
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
 }
 
 function sanitizeHttpUrl(raw) {
     try {
-        var parsed = new URL(raw);
+        const parsed = new URL(raw);
         if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
         return parsed.href;
     } catch (_) {
@@ -93,27 +93,27 @@ function sanitizeHttpUrl(raw) {
 
 // --- IndexedDB for Default-cap background ---
 
-var _bgObjectUrl = null;
-var _bgDb = null;
-var _bgDbReady = false;
-var _bgDbFailed = false;
-var _bgDbCallbacks = [];
+let _bgObjectUrl = null;
+let _bgDb = null;
+let _bgDbReady = false;
+let _bgDbFailed = false;
+const _bgDbCallbacks = [];
 
 (function _openBgDb() {
-    var req = indexedDB.open("nozy-bg", 1);
-    req.onupgradeneeded = function(e) {
+    const req = indexedDB.open("nozy-bg", 1);
+    req.onupgradeneeded = (e) => {
         e.target.result.createObjectStore("bg");
     };
-    req.onsuccess = function(e) {
+    req.onsuccess = (e) => {
         _bgDb = e.target.result;
         _bgDbReady = true;
-        var cbs = _bgDbCallbacks.splice(0);
-        cbs.forEach(function(fn) { fn(); });
+        const cbs = _bgDbCallbacks.splice(0);
+        cbs.forEach(fn => fn());
     };
-    req.onerror = function() {
+    req.onerror = () => {
         _bgDbFailed = true;
-        var cbs = _bgDbCallbacks.splice(0);
-        cbs.forEach(function(fn) { fn(); });
+        const cbs = _bgDbCallbacks.splice(0);
+        cbs.forEach(fn => fn());
     };
 }());
 
@@ -122,21 +122,21 @@ function _whenBgDbReady(fn) {
 }
 
 function _dataUrlToBlob(dataUrl) {
-    var arr = dataUrl.split(",");
+    const arr = dataUrl.split(",");
     if (arr.length < 2 || !arr[1]) return new Blob([], { type: "image/jpeg" });
-    var mimeMatch = arr[0].match(/:(.*?);/);
-    var mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
-    var bstr = atob(arr[1]);
-    var u8arr = new Uint8Array(bstr.length);
-    for (var i = 0; i < bstr.length; i++) u8arr[i] = bstr.charCodeAt(i);
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+    const bstr = atob(arr[1]);
+    const u8arr = new Uint8Array(bstr.length);
+    for (let i = 0; i < bstr.length; i++) u8arr[i] = bstr.charCodeAt(i);
     return new Blob([u8arr], { type: mime });
 }
 
 function _clearBgIdb(callback) {
-    _whenBgDbReady(function() {
+    _whenBgDbReady(() => {
         if (!_bgDb) { if (callback) callback(); return; }
-        var tx = _bgDb.transaction("bg", "readwrite");
-        var req = tx.objectStore("bg").delete("bg_image");
+        const tx = _bgDb.transaction("bg", "readwrite");
+        const req = tx.objectStore("bg").delete("bg_image");
         req.onsuccess = req.onerror = callback || function() {};
     });
 }
@@ -144,12 +144,12 @@ function _clearBgIdb(callback) {
 // --- Background Helpers ---
 
 function _getBgImageFromLocalStorage() {
-    var fallback = localStorage.getItem(STORAGE_KEYS.BG_IMAGE) || "";
+    const fallback = localStorage.getItem(STORAGE_KEYS.BG_IMAGE) || "";
     return sanitizeHttpUrl(fallback) || "";
 }
 
 function _setBgImageFallback(value) {
-    var safeUrl = sanitizeHttpUrl(value);
+    const safeUrl = sanitizeHttpUrl(value);
     if (!value || !safeUrl) {
         localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
         return;
@@ -158,13 +158,13 @@ function _setBgImageFallback(value) {
 }
 
 function getBgImage(callback) {
-    _whenBgDbReady(function() {
-        var fallback = _getBgImageFromLocalStorage();
+    _whenBgDbReady(() => {
+        const fallback = _getBgImageFromLocalStorage();
         if (_bgDb) {
-            var tx = _bgDb.transaction("bg", "readonly");
-            var req = tx.objectStore("bg").get("bg_image");
-            req.onsuccess = function() {
-                var stored = req.result;
+            const tx = _bgDb.transaction("bg", "readonly");
+            const req = tx.objectStore("bg").get("bg_image");
+            req.onsuccess = () => {
+                const stored = req.result;
                 if (stored instanceof Blob) {
                     if (_bgObjectUrl) URL.revokeObjectURL(_bgObjectUrl);
                     _bgObjectUrl = URL.createObjectURL(stored);
@@ -173,7 +173,7 @@ function getBgImage(callback) {
                 }
                 callback(typeof stored === "string" ? stored : fallback);
             };
-            req.onerror = function() { callback(fallback); };
+            req.onerror = () => { callback(fallback); };
         } else {
             callback(fallback);
         }
@@ -181,7 +181,7 @@ function getBgImage(callback) {
 }
 
 function saveBgImage(value, callback) {
-    var cb = callback || function() {};
+    const cb = callback || function() {};
     if (!value) {
         if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
         localStorage.removeItem(STORAGE_KEYS.BG_IMAGE_TYPE);
@@ -190,33 +190,33 @@ function saveBgImage(value, callback) {
         return;
     }
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, "image"); // only reached when value is non-empty
-    _whenBgDbReady(function() {
+    _whenBgDbReady(() => {
         if (!_bgDb) {
             _setBgImageFallback(value);
             cb();
             return;
         }
         localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
-        var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+        const cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
         if (cap === "default" && value.startsWith("data:image/")) {
-            var blob = _dataUrlToBlob(value);
-            var tx = _bgDb.transaction("bg", "readwrite");
-            var req = tx.objectStore("bg").put(blob, "bg_image");
-            req.onsuccess = function() { cb(); };
-            req.onerror = function() {
+            const blob = _dataUrlToBlob(value);
+            const tx = _bgDb.transaction("bg", "readwrite");
+            const req = tx.objectStore("bg").put(blob, "bg_image");
+            req.onsuccess = () => { cb(); };
+            req.onerror = () => {
                 // IDB write failed — fall back to storing the data URL string in IDB
                 if (!_bgDb) { _setBgImageFallback(value); cb(); return; }
-                var tx2 = _bgDb.transaction("bg", "readwrite");
-                tx2.objectStore("bg").put(value, "bg_image").onsuccess = function() { cb(); };
-                tx2.onerror = function() { _setBgImageFallback(value); cb(); };
+                const tx2 = _bgDb.transaction("bg", "readwrite");
+                tx2.objectStore("bg").put(value, "bg_image").onsuccess = () => { cb(); };
+                tx2.onerror = () => { _setBgImageFallback(value); cb(); };
             };
         } else {
             // Revoke any stale ObjectURL and store as a string (URL/data URL) in IDB
             if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
-            var tx = _bgDb.transaction("bg", "readwrite");
-            var req = tx.objectStore("bg").put(value, "bg_image");
-            req.onsuccess = function() { cb(); };
-            req.onerror = function() { _setBgImageFallback(value); cb(); };
+            const tx = _bgDb.transaction("bg", "readwrite");
+            const req = tx.objectStore("bg").put(value, "bg_image");
+            req.onsuccess = () => { cb(); };
+            req.onerror = () => { _setBgImageFallback(value); cb(); };
         }
     });
 }
@@ -226,14 +226,14 @@ function saveBgImage(value, callback) {
 function _saveBlobToIdb(blob, mediaType, callback) {
     localStorage.setItem(STORAGE_KEYS.BG_IMAGE_TYPE, mediaType);
     localStorage.removeItem(STORAGE_KEYS.BG_IMAGE);
-    var cb = callback || function() {};
+    const cb = callback || function() {};
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
-    _whenBgDbReady(function() {
+    _whenBgDbReady(() => {
         if (!_bgDb) { cb(); return; }
-        var tx = _bgDb.transaction("bg", "readwrite");
-        var req = tx.objectStore("bg").put(blob, "bg_image");
-        req.onsuccess = function() { cb(); };
-        req.onerror = function() { cb(); };
+        const tx = _bgDb.transaction("bg", "readwrite");
+        const req = tx.objectStore("bg").put(blob, "bg_image");
+        req.onsuccess = () => { cb(); };
+        req.onerror = () => { cb(); };
     });
 }
 
@@ -247,7 +247,7 @@ function saveBgImageBlob(blob, callback) {
 
 function setBodyBgImage(safeUrl) {
     backgroundLayer.classList.remove("bg-disabled");
-    backgroundLayer.style.backgroundImage = safeUrl ? "url(" + JSON.stringify(safeUrl) + ")" : "";
+    backgroundLayer.style.backgroundImage = safeUrl ? `url(${JSON.stringify(safeUrl)})` : "";
     backgroundVideo.pause();
     backgroundVideo.removeAttribute("src");
     backgroundVideo.classList.add("bg-disabled");
@@ -263,10 +263,10 @@ function setBodyBgVideo(safeUrl) {
 // --- DOM Helpers ---
 
 function applyCustomFont(url, family) {
-    var existing = document.getElementById("custom-font-stylesheet");
+    const existing = document.getElementById("custom-font-stylesheet");
     if (existing) existing.remove();
     if (url) {
-        var link = document.createElement("link");
+        const link = document.createElement("link");
         link.id = "custom-font-stylesheet";
         link.rel = "stylesheet";
         link.href = url;
@@ -276,7 +276,7 @@ function applyCustomFont(url, family) {
 }
 
 function setFavicon(href) {
-    var link = document.querySelector("link[rel~='icon']");
+    let link = document.querySelector("link[rel~='icon']");
     if (href) {
         if (!link) {
             link = document.createElement("link");
@@ -292,10 +292,10 @@ function setFavicon(href) {
 // --- Apply Settings Functions ---
 
 function applyThemeSettings() {
-    var bgColor = localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR;
-    var surfaceColor = localStorage.getItem(STORAGE_KEYS.SURFACE_COLOR) || DEFAULTS.SURFACE_COLOR;
-    var highlightColor = localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR;
-    var textColor = localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR;
+    const bgColor = localStorage.getItem(STORAGE_KEYS.BG_COLOR) || DEFAULTS.BG_COLOR;
+    const surfaceColor = localStorage.getItem(STORAGE_KEYS.SURFACE_COLOR) || DEFAULTS.SURFACE_COLOR;
+    const highlightColor = localStorage.getItem(STORAGE_KEYS.HIGHLIGHT_COLOR) || DEFAULTS.HIGHLIGHT_COLOR;
+    const textColor = localStorage.getItem(STORAGE_KEYS.TEXT_COLOR) || DEFAULTS.TEXT_COLOR;
 
     docStyle.setProperty("--bg-color", bgColor);
     docStyle.setProperty("--surface", hexToRgba(surfaceColor, 0.52));
@@ -318,10 +318,10 @@ function applyThemeSettings() {
 }
 
 function applyBackground() {
-    var bgImageInput = document.getElementById("bg-image");
-    var bgImageToggle = document.getElementById("bg-image-toggle");
-    var enabled = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_ENABLED) !== "false";
-    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
+    const bgImageInput = document.getElementById("bg-image");
+    const bgImageToggle = document.getElementById("bg-image-toggle");
+    const enabled = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_ENABLED) !== "false";
+    const isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
 
     if (bgImageToggle) bgImageToggle.checked = enabled;
 
@@ -338,7 +338,7 @@ function applyBackground() {
     backgroundLayer.classList.remove("bg-disabled");
     backgroundLayer.style.backgroundImage = "";
 
-    getBgImage(function(image) {
+    getBgImage((image) => {
         if (!image) {
             bgImageInput.value = "";
             // No custom image — CSS default already showing, nothing more to do
@@ -348,8 +348,8 @@ function applyBackground() {
             setBodyBgVideo(image);
             return;
         }
-        var isLocalImage = image.startsWith("data:image/") || image.startsWith("blob:");
-        var safeRemoteUrl = isLocalImage ? image : sanitizeHttpUrl(image);
+        const isLocalImage = image.startsWith("data:image/") || image.startsWith("blob:");
+        const safeRemoteUrl = isLocalImage ? image : sanitizeHttpUrl(image);
 
         if (!safeRemoteUrl) {
             saveBgImage("");
@@ -366,26 +366,26 @@ function brightnessScale(value) {
 }
 
 function applyBackgroundBrightness() {
-    var raw = localStorage.getItem(STORAGE_KEYS.BG_BRIGHTNESS);
-    var parsed = Number(raw);
-    var brightnessValue = Number.isFinite(parsed) ? Math.max(-100, Math.min(100, parsed)) : 0;
+    const raw = localStorage.getItem(STORAGE_KEYS.BG_BRIGHTNESS);
+    const parsed = Number(raw);
+    const brightnessValue = Number.isFinite(parsed) ? Math.max(-100, Math.min(100, parsed)) : 0;
     document.getElementById("bg-brightness").value = String(brightnessValue);
     docStyle.setProperty("--bg-image-brightness", String(brightnessScale(brightnessValue)));
 }
 
 function applyBgImageCapSetting() {
-    var cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
-    var isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
-    var capEl = document.getElementById("bg-image-cap");
+    const cap = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_CAP) || DEFAULTS.BG_IMAGE_CAP;
+    const isVideo = localStorage.getItem(STORAGE_KEYS.BG_IMAGE_TYPE) === "video";
+    const capEl = document.getElementById("bg-image-cap");
     capEl.value = cap;
     capEl.disabled = isVideo;
     capEl.title = isVideo ? "Quality cap does not apply to video backgrounds." : "";
 }
 
 function applyBgFileSizeCapSetting() {
-    var raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
-    var val = Number(raw);
-    var capped = (Number.isFinite(val) && val > 0 && val <= MAX_FILE_SIZE_MB) ? val : Number(DEFAULTS.BG_FILE_SIZE_CAP);
+    const raw = localStorage.getItem(STORAGE_KEYS.BG_FILE_SIZE_CAP);
+    const val = Number(raw);
+    const capped = (Number.isFinite(val) && val > 0 && val <= MAX_FILE_SIZE_MB) ? val : Number(DEFAULTS.BG_FILE_SIZE_CAP);
     document.getElementById("bg-file-size-cap").value = String(capped);
 }
 
@@ -396,16 +396,16 @@ function applyBgFileSizeCapSetting() {
  * Returns 0 for any non-finite input.
  */
 function fracToPx(fracStr, dim) {
-    var frac = Number(fracStr);
+    const frac = Number(fracStr);
     return Number.isFinite(frac) ? Math.round(frac * dim) : 0;
 }
 
 function applyClockSettings() {
-    var clockSize = localStorage.getItem(STORAGE_KEYS.CLOCK_SIZE) || DEFAULTS.CLOCK_SIZE;
-    var clockXFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_X) || DEFAULTS.CLOCK_X;
-    var clockYFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || DEFAULTS.CLOCK_Y;
-    var clockXPx = fracToPx(clockXFrac, window.innerWidth);
-    var clockYPx = fracToPx(clockYFrac, window.innerHeight);
+    const clockSize = localStorage.getItem(STORAGE_KEYS.CLOCK_SIZE) || DEFAULTS.CLOCK_SIZE;
+    const clockXFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_X) || DEFAULTS.CLOCK_X;
+    const clockYFrac = localStorage.getItem(STORAGE_KEYS.CLOCK_Y) || DEFAULTS.CLOCK_Y;
+    const clockXPx = fracToPx(clockXFrac, window.innerWidth);
+    const clockYPx = fracToPx(clockYFrac, window.innerHeight);
 
     document.getElementById("clock-size").value = clockSize;
     document.getElementById("clock-x").value = clockXPx;
@@ -416,26 +416,26 @@ function applyClockSettings() {
 }
 
 function applyClockVisibility() {
-    var clockHidden = localStorage.getItem(STORAGE_KEYS.CLOCK_HIDDEN) === "true";
-    var dateHidden = localStorage.getItem(STORAGE_KEYS.DATE_HIDDEN) === "true";
-    var clockToggle = document.getElementById("clock-hidden-toggle");
-    var dateToggle = document.getElementById("date-hidden-toggle");
+    const clockHidden = localStorage.getItem(STORAGE_KEYS.CLOCK_HIDDEN) === "true";
+    const dateHidden = localStorage.getItem(STORAGE_KEYS.DATE_HIDDEN) === "true";
+    const clockToggle = document.getElementById("clock-hidden-toggle");
+    const dateToggle = document.getElementById("date-hidden-toggle");
 
     if (clockToggle) clockToggle.checked = clockHidden;
     if (dateToggle) dateToggle.checked = dateHidden;
 
-    var timeEl = document.getElementById("time");
-    var dateEl = document.getElementById("date");
+    const timeEl = document.getElementById("time");
+    const dateEl = document.getElementById("date");
     if (timeEl) timeEl.classList.toggle("hidden", clockHidden);
     if (dateEl) dateEl.classList.toggle("hidden", dateHidden);
 }
 
 function applySearchBarSettings() {
-    var searchWidth = localStorage.getItem(STORAGE_KEYS.SEARCH_WIDTH) || DEFAULTS.SEARCH_WIDTH;
-    var searchXFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X;
-    var searchYFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y;
-    var searchXPx = fracToPx(searchXFrac, window.innerWidth);
-    var searchYPx = fracToPx(searchYFrac, window.innerHeight);
+    const searchWidth = localStorage.getItem(STORAGE_KEYS.SEARCH_WIDTH) || DEFAULTS.SEARCH_WIDTH;
+    const searchXFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_X) || DEFAULTS.SEARCH_X;
+    const searchYFrac = localStorage.getItem(STORAGE_KEYS.SEARCH_Y) || DEFAULTS.SEARCH_Y;
+    const searchXPx = fracToPx(searchXFrac, window.innerWidth);
+    const searchYPx = fracToPx(searchYFrac, window.innerHeight);
 
     document.getElementById("search-width").value = searchWidth;
     document.getElementById("search-x").value = searchXPx;
@@ -446,24 +446,24 @@ function applySearchBarSettings() {
 }
 
 function applyFontSettings() {
-    var fontUrl = localStorage.getItem(STORAGE_KEYS.FONT_URL) || "";
-    var fontFamily = localStorage.getItem(STORAGE_KEYS.FONT_FAMILY) || DEFAULTS.FONT_FAMILY;
+    const fontUrl = localStorage.getItem(STORAGE_KEYS.FONT_URL) || "";
+    const fontFamily = localStorage.getItem(STORAGE_KEYS.FONT_FAMILY) || DEFAULTS.FONT_FAMILY;
     document.getElementById("font-url").value = fontUrl;
     document.getElementById("font-family").value = fontFamily;
     applyCustomFont(fontUrl, fontFamily);
 }
 
 function applyGeneralSettings() {
-    var tabName = localStorage.getItem(STORAGE_KEYS.TAB_NAME) || DEFAULTS.TAB_NAME;
-    var favicon = localStorage.getItem(STORAGE_KEYS.FAVICON) || DEFAULTS.FAVICON;
-    var faviconUrlEl = document.getElementById("favicon-url");
+    const tabName = localStorage.getItem(STORAGE_KEYS.TAB_NAME) || DEFAULTS.TAB_NAME;
+    const favicon = localStorage.getItem(STORAGE_KEYS.FAVICON) || DEFAULTS.FAVICON;
+    const faviconUrlEl = document.getElementById("favicon-url");
 
     document.getElementById("tab-name").value = tabName;
     document.title = tabName || "New Tab";
 
     if (favicon) {
-        var isDataImage = favicon.startsWith("data:image/");
-        var safeUrl = isDataImage ? favicon : sanitizeHttpUrl(favicon);
+        const isDataImage = favicon.startsWith("data:image/");
+        const safeUrl = isDataImage ? favicon : sanitizeHttpUrl(favicon);
         if (safeUrl) {
             setFavicon(safeUrl);
             faviconUrlEl.value = isDataImage ? "" : safeUrl;
@@ -479,16 +479,16 @@ function applyGeneralSettings() {
 }
 
 function applySearchSettings() {
-    var searchUrlInput = document.getElementById("search-url");
+    const searchUrlInput = document.getElementById("search-url");
     if (searchUrlInput) {
         searchUrlInput.value = localStorage.getItem(STORAGE_KEYS.SEARCH_URL) || "";
     }
 }
 
 function applyFavoritesEnabled() {
-    var favoritesSection = document.getElementById("favorites-section");
-    var favoritesToggle = document.getElementById("favorites-enabled-toggle");
-    var enabled = localStorage.getItem(STORAGE_KEYS.FAVORITES_ENABLED) !== "false";
+    const favoritesSection = document.getElementById("favorites-section");
+    const favoritesToggle = document.getElementById("favorites-enabled-toggle");
+    const enabled = localStorage.getItem(STORAGE_KEYS.FAVORITES_ENABLED) !== "false";
 
     if (favoritesToggle) favoritesToggle.checked = enabled;
     if (favoritesSection) favoritesSection.classList.toggle("hidden", !enabled);
@@ -497,19 +497,19 @@ function applyFavoritesEnabled() {
 function applyFavoritesSettings() {
     applyFavoritesEnabled();
 
-    var addBtn = document.getElementById("add-btn");
-    var favoritesSection = document.getElementById("favorites-section");
-    var showAddToggle = document.getElementById("favorites-show-add-toggle");
-    var layoutSelect = document.getElementById("favorites-layout-select");
+    const addBtn = document.getElementById("add-btn");
+    const favoritesSection = document.getElementById("favorites-section");
+    const showAddToggle = document.getElementById("favorites-show-add-toggle");
+    const layoutSelect = document.getElementById("favorites-layout-select");
 
-    var showAdd = localStorage.getItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN) !== "false";
-    var layout = localStorage.getItem(STORAGE_KEYS.FAVORITES_LAYOUT) || "row";
-    var isColumn = layout === "column";
+    const showAdd = localStorage.getItem(STORAGE_KEYS.FAVORITES_SHOW_ADD_BTN) !== "false";
+    const layout = localStorage.getItem(STORAGE_KEYS.FAVORITES_LAYOUT) || "row";
+    const isColumn = layout === "column";
 
-    var favXFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || "0";
-    var favYFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || "0";
-    var favXPx = fracToPx(favXFrac, window.innerWidth);
-    var favYPx = fracToPx(favYFrac, window.innerHeight);
+    const favXFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_X) || "0";
+    const favYFrac = localStorage.getItem(STORAGE_KEYS.FAVORITES_Y) || "0";
+    const favXPx = fracToPx(favXFrac, window.innerWidth);
+    const favYPx = fracToPx(favYFrac, window.innerHeight);
 
     if (showAddToggle) showAddToggle.checked = showAdd;
     if (layoutSelect) layoutSelect.value = layout;
@@ -517,13 +517,13 @@ function applyFavoritesSettings() {
     if (addBtn) addBtn.classList.toggle("hidden", !showAdd);
     if (favoritesSection) favoritesSection.classList.toggle("favorites-column", isColumn);
 
-    var favXInput = document.getElementById("favorites-x");
-    var favYInput = document.getElementById("favorites-y");
+    const favXInput = document.getElementById("favorites-x");
+    const favYInput = document.getElementById("favorites-y");
     if (favXInput) favXInput.value = favXPx;
     if (favYInput) favYInput.value = favYPx;
 
-    docStyle.setProperty("--favorites-x", favXPx + "px");
-    docStyle.setProperty("--favorites-y", favYPx + "px");
+    docStyle.setProperty("--favorites-x", `${favXPx}px`);
+    docStyle.setProperty("--favorites-y", `${favYPx}px`);
 }
 
 // --- Favorites ---
@@ -542,7 +542,7 @@ function saveFavorites(favorites) {
 
 function getFaviconUrl(url) {
     try {
-        var hostname = new URL(url).hostname;
+        const hostname = new URL(url).hostname;
         return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
     } catch (_) {
         return null;
@@ -550,20 +550,20 @@ function getFaviconUrl(url) {
 }
 
 function createFallbackIcon(name) {
-    var div = document.createElement("div");
+    const div = document.createElement("div");
     div.className = "fav-icon-fallback";
     div.textContent = name.charAt(0).toUpperCase();
     return div;
 }
 
 function createFavElement(fav, index) {
-    var a = document.createElement("a");
+    const a = document.createElement("a");
     a.href = fav.url;
     a.className = "fav-item";
 
-    var faviconUrl = getFaviconUrl(fav.url);
+    const faviconUrl = getFaviconUrl(fav.url);
     if (faviconUrl) {
-        var img = document.createElement("img");
+        const img = document.createElement("img");
         img.src = faviconUrl;
         img.alt = fav.name;
         img.className = "fav-icon";
@@ -575,17 +575,17 @@ function createFavElement(fav, index) {
         a.appendChild(createFallbackIcon(fav.name));
     }
 
-    var nameSpan = document.createElement("span");
+    const nameSpan = document.createElement("span");
     nameSpan.className = "fav-name";
     nameSpan.textContent = fav.name;
     a.appendChild(nameSpan);
 
-    var removeBtn = document.createElement("button");
+    const removeBtn = document.createElement("button");
     removeBtn.className = "fav-remove";
-    removeBtn.title = "Remove " + fav.name;
-    removeBtn.setAttribute("aria-label", "Remove " + fav.name);
+    removeBtn.title = `Remove ${fav.name}`;
+    removeBtn.setAttribute("aria-label", `Remove ${fav.name}`);
     removeBtn.textContent = "×";
-    removeBtn.addEventListener("click", function(e) {
+    removeBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         removeFavorite(index);
@@ -595,10 +595,10 @@ function createFavElement(fav, index) {
 }
 
 function renderFavorites(favorites) {
-    var favGrid = document.getElementById("favorites-grid");
+    const favGrid = document.getElementById("favorites-grid");
     if (!favorites) favorites = loadFavorites();
-    var fragment = document.createDocumentFragment();
-    favorites.forEach(function(fav, index) {
+    const fragment = document.createDocumentFragment();
+    favorites.forEach((fav, index) => {
         fragment.appendChild(createFavElement(fav, index));
     });
     favGrid.innerHTML = "";
@@ -606,31 +606,31 @@ function renderFavorites(favorites) {
 }
 
 function removeFavorite(index) {
-    var favorites = loadFavorites();
+    const favorites = loadFavorites();
     favorites.splice(index, 1);
     saveFavorites(favorites);
     renderFavorites(favorites);
 }
 
 function addFavorite(name, url) {
-    var favorites = loadFavorites();
-    favorites.push({ name: name, url: url });
+    const favorites = loadFavorites();
+    favorites.push({ name, url });
     saveFavorites(favorites);
     renderFavorites(favorites);
 }
 
 // --- Video background lifecycle ---
 
-document.addEventListener("visibilitychange", function() {
+document.addEventListener("visibilitychange", () => {
     if (!backgroundVideo.classList.contains("bg-disabled")) {
         if (document.hidden) {
             backgroundVideo.pause();
         } else {
-            backgroundVideo.play().catch(function() {});
+            backgroundVideo.play().catch(() => {});
         }
     }
 });
 
-window.addEventListener("pagehide", function() {
+window.addEventListener("pagehide", () => {
     if (_bgObjectUrl) { URL.revokeObjectURL(_bgObjectUrl); _bgObjectUrl = null; }
 });

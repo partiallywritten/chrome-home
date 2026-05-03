@@ -1,21 +1,21 @@
 "use strict";
 
 // --- DOM Elements ---
-var browseThemesBtn = document.getElementById("browse-themes-btn");
-var themesEnabledToggle = document.getElementById("themes-enabled-toggle");
-var communityThemesToggle = document.getElementById("community-themes-toggle");
-var themesOverlay = document.getElementById("themes-overlay");
-var themesGrid = document.getElementById("themes-grid");
-var themesStatus = document.getElementById("themes-status");
+const browseThemesBtn = document.getElementById("browse-themes-btn");
+const themesEnabledToggle = document.getElementById("themes-enabled-toggle");
+const communityThemesToggle = document.getElementById("community-themes-toggle");
+const themesOverlay = document.getElementById("themes-overlay");
+const themesGrid = document.getElementById("themes-grid");
+const themesStatus = document.getElementById("themes-status");
 
 // --- Themes ---
 
 function getThemeFolder(idStr) {
-    return /^nnt-/.test(idStr) ? "themes/community/" + idStr : "themes/included/" + idStr;
+    return /^nnt-/.test(idStr) ? `themes/community/${idStr}` : `themes/included/${idStr}`;
 }
 
 function getActiveThemeId() {
-    var storedId = localStorage.getItem(STORAGE_KEYS.THEME);
+    const storedId = localStorage.getItem(STORAGE_KEYS.THEME);
     if (storedId === null) return 0;
     if (storedId === "user") return null;
     if (/^nnt-/.test(storedId)) return storedId;
@@ -31,7 +31,7 @@ function isThemeActive(idStr, activeId) {
 function applyThemePreset(theme, themeId) {
     // Write theme settings to localStorage.
     // null/undefined = omitted (keep user value); empty string = remove key; any other value = set key.
-    var set = function(key, val) {
+    const set = (key, val) => {
         if (val === null || val === undefined) return;
         if (val === "") localStorage.removeItem(key);
         else localStorage.setItem(key, val);
@@ -56,7 +56,7 @@ function applyThemePreset(theme, themeId) {
     set(STORAGE_KEYS.FAVORITES_Y, theme.favoritesY);
     set(STORAGE_KEYS.FAVORITES_LAYOUT, theme.favoritesLayout);
 
-    var bgEnabled = theme.bgImageEnabled !== false;
+    let bgEnabled = theme.bgImageEnabled !== false;
     if (theme.bgImageEnabled !== null && theme.bgImageEnabled !== undefined) {
         localStorage.setItem(STORAGE_KEYS.BG_IMAGE_ENABLED, bgEnabled ? "true" : "false");
     } else {
@@ -97,66 +97,66 @@ function applyThemePreset(theme, themeId) {
 
     // Fetch the theme background image, process through canvas (respecting cap), save as data URL
     if (!bgEnabled) {
-        saveBgImage("", function() { applyBackground(); });
+        saveBgImage("", () => { applyBackground(); });
     } else if (theme.animated === true) {
         // Animated background: force quality cap to default, fetch webm/mp4, save as video
         forceBgCapToDefault();
         syncBgCapSelectState();
-        var themeFolder = getThemeFolder(String(themeId));
-        fetch(themeFolder + "/background.webm")
-            .then(function(r) {
+        const themeFolder = getThemeFolder(String(themeId));
+        fetch(`${themeFolder}/background.webm`)
+            .then((r) => {
                 if (!r.ok) throw new Error("WebM not found");
                 return r.blob();
             })
-            .catch(function() {
-                return fetch(themeFolder + "/background.mp4").then(function(r) {
+            .catch(() => {
+                return fetch(`${themeFolder}/background.mp4`).then((r) => {
                     if (!r.ok) throw new Error("MP4 not found");
                     return r.blob();
                 });
             })
-            .then(function(blob) {
-                saveBgVideo(blob, function() {
-                    getBgImage(function(blobUrl) {
+            .then((blob) => {
+                saveBgVideo(blob, () => {
+                    getBgImage((blobUrl) => {
                         if (blobUrl) setBodyBgVideo(blobUrl);
                         else applyBackground();
                     });
                 });
             })
-            .catch(function() {
+            .catch(() => {
                 applyBackground();
             });
     } else {
-        var themeFolder = getThemeFolder(String(themeId));
-        fetch(themeFolder + "/background.webp")
-            .then(function(r) {
+        const themeFolder = getThemeFolder(String(themeId));
+        fetch(`${themeFolder}/background.webp`)
+            .then((r) => {
                 if (!r.ok) throw new Error("WebP not found");
                 return r.blob();
             })
-            .catch(function() {
-                return fetch(themeFolder + "/background.jpg").then(function(r) {
+            .catch(() => {
+                return fetch(`${themeFolder}/background.jpg`).then((r) => {
                     if (!r.ok) throw new Error("JPEG not found");
                     return r.blob();
                 });
             })
-            .then(function(blob) {
-                var dims = getBgImageCapDimensions();
+            .then((blob) => {
+                const dims = getBgImageCapDimensions();
                 if (!dims) {
-                    saveBgImageBlob(blob, function() {
-                        getBgImage(function(url) {
+                    saveBgImageBlob(blob, () => {
+                        getBgImage((url) => {
                             if (url) setBodyBgImage(url);
                             else applyBackground();
                         });
                     });
                 } else {
-                    var objUrl = URL.createObjectURL(blob);
-                    compressImage(objUrl, dims.width, dims.height, 0.8, function(compressed) {
+                    const objUrl = URL.createObjectURL(blob);
+                    compressImage(objUrl, dims.width, dims.height, 0.8, (compressed) => {
                         URL.revokeObjectURL(objUrl);
                         setBodyBgImage(compressed);
                         saveBgImage(compressed);
                     });
                 }
             })
-            .catch(function() {
+            .catch(() => {
                 applyBackground();
             });
     }
@@ -166,56 +166,56 @@ function applyThemePreset(theme, themeId) {
 }
 
 function renderThemeActiveState(activeId) {
-    var cards = themesGrid.querySelectorAll(".theme-card");
-    cards.forEach(function (card) {
-        var active = isThemeActive(card.dataset.themeId, activeId);
+    const cards = themesGrid.querySelectorAll(".theme-card");
+    cards.forEach((card) => {
+        const active = isThemeActive(card.dataset.themeId, activeId);
         card.classList.toggle("theme-card--active", active);
         card.setAttribute("aria-pressed", active ? "true" : "false");
     });
 }
 
 function createThemeCard(idStr, name, isActive) {
-    var card = document.createElement("button");
-    card.className = "theme-card" + (isActive ? " theme-card--active" : "");
+    const card = document.createElement("button");
+    card.className = `theme-card${isActive ? " theme-card--active" : ""}`;
     card.dataset.themeId = idStr;
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
     card.title = name;
 
-    var thumb = document.createElement("div");
+    const thumb = document.createElement("div");
     thumb.className = "theme-card__thumb";
-    var img = document.createElement("img");
-    img.src = getThemeFolder(idStr) + "/preview.webp";
+    const img = document.createElement("img");
+    img.src = `${getThemeFolder(idStr)}/preview.webp`;
     img.onerror = function() {
         img.onerror = null;
         img.onerror = function() {
             img.onerror = null;
-            img.src = getThemeFolder(idStr) + "/background.jpg";
+            img.src = `${getThemeFolder(idStr)}/background.jpg`;
         };
-        img.src = getThemeFolder(idStr) + "/background.webp";
+        img.src = `${getThemeFolder(idStr)}/background.webp`;
     };
     img.alt = "";
     img.className = "theme-card__img";
     thumb.appendChild(img);
 
-    var label = document.createElement("span");
+    const label = document.createElement("span");
     label.className = "theme-card__name";
     label.textContent = name;
 
     card.appendChild(thumb);
     card.appendChild(label);
 
-    card.addEventListener("click", function () {
-        fetch(getThemeFolder(idStr) + "/theme.json")
-            .then(function (r) {
+    card.addEventListener("click", () => {
+        fetch(`${getThemeFolder(idStr)}/theme.json`)
+            .then((r) => {
                 if (!r.ok) throw new Error("Theme not found");
                 return r.json();
             })
-            .then(function (themeData) {
-                var themeIdVal = /^nnt-/.test(idStr) ? idStr : Number(idStr);
+            .then((themeData) => {
+                const themeIdVal = /^nnt-/.test(idStr) ? idStr : Number(idStr);
                 applyThemePreset(themeData, themeIdVal);
             })
-            .catch(function () {
-                themesStatus.textContent = "Failed to load theme \u201c" + name + "\u201d.";
+            .catch(() => {
+                themesStatus.textContent = `Failed to load theme \u201c${name}\u201d.`;
             });
     });
 
@@ -224,14 +224,14 @@ function createThemeCard(idStr, name, isActive) {
 
 function renderThemeGrid(themes) {
     themesGrid.innerHTML = "";
-    var activeId = getActiveThemeId();
+    const activeId = getActiveThemeId();
 
-    var includedItems = [];
+    const includedItems = [];
 
-    themes.forEach(function (t) {
-        var id = t.id;
+    themes.forEach((t) => {
+        const id = t.id;
         if (typeof id === "number" || (typeof id === "string" && /^\d+$/.test(id))) {
-            var safeId = Math.floor(Number(id));
+            const safeId = Math.floor(Number(id));
             if (!Number.isFinite(safeId) || safeId < 0) return;
             includedItems.push({ id: String(safeId), name: t.name });
         }
@@ -239,11 +239,11 @@ function renderThemeGrid(themes) {
 
     function appendSection(label, items) {
         if (!items.length) return;
-        var sectionLabel = document.createElement("p");
+        const sectionLabel = document.createElement("p");
         sectionLabel.className = "themes-section-label";
         sectionLabel.textContent = label;
         themesGrid.appendChild(sectionLabel);
-        items.forEach(function (item) {
+        items.forEach((item) => {
             themesGrid.appendChild(createThemeCard(item.id, item.name, isThemeActive(item.id, activeId)));
         });
     }
@@ -254,11 +254,11 @@ function renderThemeGrid(themes) {
 function loadThemesRegistry(onComplete) {
     themesStatus.textContent = "";
     fetch("themes/included_themes.json")
-        .then(function(r) {
+        .then((r) => {
             if (!r.ok) throw new Error("Registry not found");
             return r.json();
         })
-        .then(function(data) {
+        .then((data) => {
             if (!Array.isArray(data) || data.length === 0) {
                 themesStatus.textContent = "No themes found in registry.";
                 if (onComplete) onComplete();
@@ -267,7 +267,7 @@ function loadThemesRegistry(onComplete) {
             renderThemeGrid(data);
             if (onComplete) onComplete();
         })
-        .catch(function() {
+        .catch(() => {
             themesStatus.textContent = "Could not load themes.";
             if (onComplete) onComplete();
         });
@@ -276,7 +276,7 @@ function loadThemesRegistry(onComplete) {
 function openThemesOverlay() {
     themesOverlay.classList.remove("hidden");
     themesOverlay.setAttribute("aria-hidden", "false");
-    var communityEnabled = localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true";
+    const communityEnabled = localStorage.getItem(STORAGE_KEYS.CUSTOM_THEMES_ENABLED) === "true";
     communityThemesToggle.checked = communityEnabled;
     loadThemesRegistry(communityEnabled ? loadCommunityThemes : null);
 }
@@ -288,25 +288,25 @@ function closeThemesOverlay() {
 
 function loadCommunityThemes() {
     fetch("themes/community_themes.json")
-        .then(function(r) {
+        .then((r) => {
             if (!r.ok) throw new Error("Registry not found");
             return r.json();
         })
-        .then(function(data) {
+        .then((data) => {
             if (!Array.isArray(data)) return;
-            var items = [];
-            data.forEach(function(t) {
-                var id = t.id;
+            const items = [];
+            data.forEach((t) => {
+                const id = t.id;
                 if (typeof id === "string" && /^nnt-[a-zA-Z0-9_-]+$/.test(id)) {
-                    var name = (typeof t.name === "string" && t.name.trim())
+                    const name = (typeof t.name === "string" && t.name.trim())
                         ? t.name.trim()
                         : id.replace(/^nnt-/, "");
-                    items.push({ id: id, name: name });
+                    items.push({ id, name });
                 }
             });
             appendCommunityThemes(items);
         })
-        .catch(function() {
+        .catch(() => {
             // community_themes.json missing or invalid — nothing to append
         });
 }
@@ -314,26 +314,26 @@ function loadCommunityThemes() {
 function appendCommunityThemes(items) {
     if (!items.length) return;
 
-    var activeId = getActiveThemeId();
+    const activeId = getActiveThemeId();
 
     // Find an existing Community section label (added by renderThemeGrid or a prior call)
-    var communityLabel = null;
-    var labels = themesGrid.querySelectorAll(".themes-section-label");
-    labels.forEach(function(label) {
+    let communityLabel = null;
+    const labels = themesGrid.querySelectorAll(".themes-section-label");
+    labels.forEach((label) => {
         if (label.textContent === "Community") communityLabel = label;
     });
 
     // Collect theme IDs already rendered in the Community section to avoid duplicates
-    var existingIds = new Set();
+    const existingIds = new Set();
     if (communityLabel) {
-        var sibling = communityLabel.nextElementSibling;
+        let sibling = communityLabel.nextElementSibling;
         while (sibling && !sibling.classList.contains("themes-section-label")) {
             if (sibling.dataset.themeId) existingIds.add(sibling.dataset.themeId);
             sibling = sibling.nextElementSibling;
         }
     }
 
-    var newItems = items.filter(function(item) { return !existingIds.has(item.id); });
+    const newItems = items.filter((item) => !existingIds.has(item.id));
     if (!newItems.length) return;
 
     if (!communityLabel) {
@@ -343,21 +343,21 @@ function appendCommunityThemes(items) {
         themesGrid.appendChild(communityLabel);
     }
 
-    newItems.forEach(function(item) {
+    newItems.forEach((item) => {
         themesGrid.appendChild(createThemeCard(item.id, item.name, isThemeActive(item.id, activeId)));
     });
 }
 
 function removeCommunityThemesFromGrid() {
-    var communityLabel = null;
-    var labels = themesGrid.querySelectorAll(".themes-section-label");
-    labels.forEach(function(label) {
+    let communityLabel = null;
+    const labels = themesGrid.querySelectorAll(".themes-section-label");
+    labels.forEach((label) => {
         if (label.textContent === "Community") communityLabel = label;
     });
     if (!communityLabel) return;
-    var sibling = communityLabel.nextElementSibling;
+    let sibling = communityLabel.nextElementSibling;
     while (sibling && !sibling.classList.contains("themes-section-label")) {
-        var next = sibling.nextElementSibling;
+        const next = sibling.nextElementSibling;
         sibling.remove();
         sibling = next;
     }
@@ -365,8 +365,8 @@ function removeCommunityThemesFromGrid() {
 }
 
 function applyThemesEnabledSetting() {
-    var stored = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED);
-    var enabled = stored === null ? true : stored === "true";
+    const stored = localStorage.getItem(STORAGE_KEYS.THEMES_ENABLED);
+    const enabled = stored === null ? true : stored === "true";
     themesEnabledToggle.checked = enabled;
     browseThemesBtn.classList.toggle("hidden", !enabled);
 }
@@ -403,14 +403,14 @@ applyThemesEnabledSetting();
 // Apply and fully persist theme 0 so null only ever occurs once.
 if (localStorage.getItem(STORAGE_KEYS.THEME) === null) {
     fetch("themes/included/0/theme.json")
-        .then(function(r) {
+        .then((r) => {
             if (!r.ok) throw new Error("Not found");
             return r.json();
         })
-        .then(function(themeData) {
+        .then((themeData) => {
             applyThemePreset(themeData, 0);
         })
-        .catch(function() {
+        .catch(() => {
             // theme.json missing — at minimum persist the id so null is never repeated
             localStorage.setItem(STORAGE_KEYS.THEME, "0");
         });
